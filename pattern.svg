@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1200 800" width="100%" height="100%" style="background-color: #1e272e;">
+
+    <defs>
+        <path id="baseTile" d="" />
+        <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+            <feDropShadow dx="2" dy="4" stdDeviation="4" flood-color="#000" flood-opacity="0.5"/>
+        </filter>
+        <pattern id="forbiddenPattern" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <rect width="10" height="10" fill="rgba(255,0,0,0.1)"/>
+            <line x1="0" y1="0" x2="0" y2="10" stroke="rgba(255,0,0,0.3)" stroke-width="2"/>
+        </pattern>
+    </defs>
+
+    <!-- Zone de pavage -->
+    <g id="tessGroup" transform="translate(300, 0)"></g>
+
+    <!-- Interface utilisateur -->
+    <g id="uiLayer">
+        <rect x="0" y="0" width="300" height="800" fill="#2d3436" />
+
+        <text x="150" y="35" font-family="sans-serif" font-size="22" fill="#dfe6e9" text-anchor="middle" font-weight="bold">Pavage Escher</text>
+        <text x="150" y="60" font-family="sans-serif" font-size="13" fill="#b2bec3" text-anchor="middle">Symétrie Centrale Parfaite</text>
+
+        <!-- Editeur de motif -->
+        <g id="editorGroup" transform="translate(150, 210)" filter="url(#shadow)">
+            <rect x="-110" y="-110" width="220" height="220" fill="#636e72" rx="5"/>
+            <rect x="-100" y="-100" width="200" height="200" fill="#2d3436" rx="2"/>
+            <line x1="50" y1="-100" x2="50" y2="100" stroke="#e17055" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>
+            <line x1="-100" y1="50" x2="100" y2="50" stroke="#e17055" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>
+            <rect x="50" y="50" width="50" height="50" fill="url(#forbiddenPattern)" />
+            <use xlink:href="#baseTile" fill="#00b894" fill-opacity="0.4" stroke="#00b894" stroke-width="2"/>
+        </g>
+
+        <!-- Gestion des Couleurs (HTML intégré via foreignObject) -->
+        <foreignObject x="30" y="370" width="240" height="130">
+            <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: sans-serif; color: #dfe6e9; display: flex; flex-direction: column; gap: 12px;">
+
+                <div style="display: flex; justify-content: space-between; align-items: center; background: #636e72; padding: 8px; border-radius: 5px;">
+                    <label style="font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                        <input type="color" id="colorA" value="#00b894" style="width: 30px; height: 30px; border: none; cursor: pointer; background: none; padding: 0;"/>
+                        Motif 1
+                    </label>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; background: #636e72; padding: 8px; border-radius: 5px;">
+                    <label style="font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                        <input type="color" id="colorB" value="#0984e3" style="width: 30px; height: 30px; border: none; cursor: pointer; background: none; padding: 0;"/>
+                        Motif 2
+                    </label>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; background: #636e72; padding: 8px; border-radius: 5px;">
+                    <label style="font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                        <input type="color" id="colorStroke" value="#1e272e" style="width: 30px; height: 30px; border: none; cursor: pointer; background: none; padding: 0;"/>
+                        Contour
+                    </label>
+                </div>
+
+            </div>
+        </foreignObject>
+
+        <!-- Instructions -->
+        <text x="150" y="540" font-family="sans-serif" font-size="13" fill="#dfe6e9" text-anchor="middle" font-weight="bold">Double-clic vide : Ajouter point</text>
+        <text x="150" y="560" font-family="sans-serif" font-size="13" fill="#dfe6e9" text-anchor="middle" font-weight="bold">Double-clic point : Supprimer</text>
+        <text x="150" y="590" font-family="sans-serif" font-size="12" fill="#e17055" text-anchor="middle">(La zone hachurée est interdite</text>
+        <text x="150" y="605" font-family="sans-serif" font-size="12" fill="#e17055" text-anchor="middle">pour éviter les chevauchements)</text>
+
+        <!-- Bouton Aléatoire -->
+        <g id="btnRandom" style="cursor: pointer;">
+            <rect x="50" y="630" width="200" height="40" rx="8" fill="#e17055"/>
+            <text x="150" y="656" font-family="sans-serif" font-size="16" fill="#fff" text-anchor="middle" font-weight="bold">Motif Aléatoire</text>
+        </g>
+    </g>
+
+    <script type="text/ecmascript">
+        <![CDATA[
+        const svgNS = "http://www.w3.org/2000/svg";
+        const svg = document.querySelector("svg");
+        const editorGroup = document.getElementById("editorGroup");
+        const tessGroup = document.getElementById("tessGroup");
+        const baseTilePath = document.getElementById("baseTile");
+        const btnRandom = document.getElementById("btnRandom");
+
+        // Références aux sélecteurs de couleur HTML
+        const colorAInput = document.getElementById("colorA");
+        const colorBInput = document.getElementById("colorB");
+        const colorStrokeInput = document.getElementById("colorStroke");
+
+        const TILE_SIZE = 100;
+        const COLS = 10;
+        const ROWS = 9;
+
+        // Couleurs par défaut
+        let COLORS = [colorAInput.value, colorBInput.value];
+        let STROKE_COLOR = colorStrokeInput.value;
+
+        let topPoints = [
+        { x: 25, y: -20 },
+        { x: 50, y: -30 },
+        { x: 75, y: -20 }
+        ];
+
+        let leftPoints = [
+        { x: -20, y: 25 },
+        { x: -30, y: 50 },
+        { x: -20, y: 75 }
+        ];
+
+        let controlCircles = [];
+        let draggingPoint = null;
+
+        // --- Génération du Chemin ---
+
+        function buildSmoothClosedPath(points) {
+        let n = points.length;
+        if (n < 2) return `M ${points[0].x} ${points[0].y} L ${points[0].x} ${points[0].y} Z`;
+            let d = `M ${points[0].x} ${points[0].y} `;
+            for (let i = 0; i < n; i++) {
+                let p0 = points[(i - 1 + n) % n];
+                let p1 = points[i];
+                let p2 = points[(i + 1) % n];
+                let p3 = points[(i + 2) % n];
+                let cp1x = p1.x + (p2.x - p0.x) / 6;
+                let cp1y = p1.y + (p2.y - p0.y) / 6;
+                let cp2x = p2.x - (p3.x - p1.x) / 6;
+                let cp2y = p2.y - (p3.y - p1.y) / 6;
+                d += `C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y} `;
+                }
+                return d + "Z";
+                }
+
+                function updatePath() {
+                const TL = { x: 0, y: 0 };
+                const TR = { x: 100, y: 0 };
+                const BR = { x: 100, y: 100 };
+                const BL = { x: 0, y: 100 };
+                let rightPoints = leftPoints.map(p => ({ x: 100 - p.x, y: 100 - p.y })).reverse();
+                let bottomPoints = topPoints.map(p => ({ x: 100 - p.x, y: 100 - p.y })).reverse();
+                let leftPointsReversed = [...leftPoints].reverse();
+                let perimeterPoints = [TL, ...topPoints, TR, ...rightPoints, BR, ...bottomPoints, BL, ...leftPointsReversed];
+                baseTilePath.setAttribute("d", buildSmoothClosedPath(perimeterPoints));
+                }
+
+                // --- Génération du Pavage ---
+                function generateTessellation() {
+                while (tessGroup.firstChild) tessGroup.removeChild(tessGroup.firstChild);
+                for (let i = -1; i < COLS; i++) {
+                    for (let j = -1; j < ROWS; j++) {
+                        let use = document.createElementNS(svgNS, "use");
+                        use.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", "#baseTile");
+                        use.setAttribute("x", i * TILE_SIZE);
+                        use.setAttribute("y", j * TILE_SIZE);
+
+                        let colorIndex = (Math.abs(i) + Math.abs(j)) % 2;
+                        use.dataset.colorIndex = colorIndex; // Stocke l'index pour MAJ rapide des couleurs
+
+                        use.setAttribute("fill", COLORS[colorIndex]);
+                        use.setAttribute("stroke", STROKE_COLOR);
+                        use.setAttribute("stroke-width", "2");
+                        use.setAttribute("stroke-linejoin", "round");
+
+                        tessGroup.appendChild(use);
+                        }
+                        }
+                        }
+
+                        // --- Mise à jour des couleurs sans régénérer la grille ---
+                        function updateColors() {
+                        COLORS = [colorAInput.value, colorBInput.value];
+                        STROKE_COLOR = colorStrokeInput.value;
+
+                        // Met à jour l'aperçu dans l'éditeur
+                        let editorPreview = editorGroup.querySelector("use");
+                        editorPreview.setAttribute("fill", COLORS[0]); // Utilise la couleur A pour l'aperçu
+                        editorPreview.setAttribute("stroke", STROKE_COLOR);
+
+                        // Met à jour toutes les tuiles du pavage
+                        let tiles = tessGroup.children;
+                        for (let i = 0; i < tiles.length; i++) {
+                            let tile = tiles[i];
+                            let cIndex = tile.dataset.colorIndex;
+                            tile.setAttribute("fill", COLORS[cIndex]);
+                            tile.setAttribute("stroke", STROKE_COLOR);
+                            }
+                            }
+
+                            // --- Interface et Contrôles ---
+
+                            function renderControls() {
+                            controlCircles.forEach(cc => cc.circle.remove());
+                            controlCircles = [];
+                            topPoints.forEach((p, i) => createControlCircle(p, "top", i));
+                            leftPoints.forEach((p, i) => createControlCircle(p, "left", i));
+                            }
+
+                            function createControlCircle(point, type, index) {
+                            let circle = document.createElementNS(svgNS, "circle");
+                            circle.setAttribute("cx", point.x);
+                            circle.setAttribute("cy", point.y);
+                            circle.setAttribute("r", 7);
+                            circle.setAttribute("fill", "#ffeaa7");
+                            circle.setAttribute("stroke", "#fdcb6e");
+                            circle.setAttribute("stroke-width", "2");
+                            circle.setAttribute("style", "cursor: move;");
+                            circle.classList.add("ctrl-point");
+                            circle.dataset.type = type;
+                            circle.dataset.index = index;
+                            circle.addEventListener("mousedown", startDrag);
+                            circle.addEventListener("touchstart", startDrag, {passive: false});
+                            editorGroup.appendChild(circle);
+                            controlCircles.push({ circle: circle, point: point, type: type, index: index });
+                            }
+
+                            function initUI() {
+                            renderControls();
+
+                            svg.addEventListener("mousemove", drag);
+                            svg.addEventListener("mouseup", endDrag);
+                            svg.addEventListener("mouseleave", endDrag);
+                            svg.addEventListener("touchmove", drag, {passive: false});
+                            svg.addEventListener("touchend", endDrag);
+
+                            editorGroup.addEventListener("dblclick", handleDblClick);
+
+                            btnRandom.addEventListener("click", randomize);
+
+                            // Écouteurs pour les changements de couleur
+                            colorAInput.addEventListener("input", updateColors);
+                            colorBInput.addEventListener("input", updateColors);
+                            colorStrokeInput.addEventListener("input", updateColors);
+                            }
+
+                            function getMousePosition(evt) {
+                            let CTM = editorGroup.getScreenCTM();
+                            let clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+                            let clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+                            return { x: (clientX - CTM.e) / CTM.a, y: (clientY - CTM.f) / CTM.d };
+                            }
+
+                            function startDrag(evt) { evt.preventDefault(); draggingPoint = evt.target; }
+
+                            function drag(evt) {
+                            if (!draggingPoint) return;
+                            evt.preventDefault();
+                            let coords = getMousePosition(evt);
+                            let type = draggingPoint.dataset.type;
+                            let index = parseInt(draggingPoint.dataset.index);
+
+                            if (type === "top") {
+                            let minY = -100, maxY = 49;
+                            let minX = index === 0 ? 1 : topPoints[index - 1].x + 1;
+                            let maxX = index === topPoints.length - 1 ? 99 : topPoints[index + 1].x - 1;
+                            topPoints[index].x = Math.max(minX, Math.min(maxX, coords.x));
+                            topPoints[index].y = Math.max(minY, Math.min(maxY, coords.y));
+                            } else {
+                            let minX = -100, maxX = 49;
+                            let minY = index === 0 ? 1 : leftPoints[index - 1].y + 1;
+                            let maxY = index === leftPoints.length - 1 ? 99 : leftPoints[index + 1].y - 1;
+                            leftPoints[index].x = Math.max(minX, Math.min(maxX, coords.x));
+                            leftPoints[index].y = Math.max(minY, Math.min(maxY, coords.y));
+                            }
+                            updateGraphics();
+                            }
+
+                            function endDrag() { draggingPoint = null; }
+
+                            function handleDblClick(evt) {
+                            evt.preventDefault();
+                            let target = evt.target;
+                            if (target.classList.contains("ctrl-point")) {
+                            let type = target.dataset.type;
+                            let index = parseInt(target.dataset.index);
+                            let arr = type === "top" ? topPoints : leftPoints;
+                            if (arr.length > 0) {
+                            arr.splice(index, 1);
+                            renderControls();
+                            updateGraphics();
+                            }
+                            return;
+                            }
+                            let coords = getMousePosition(evt);
+                            if (coords.y < 50 && coords.x > 0 && coords.x < 100) {
+                                    let newPoint = {x: coords.x, y: coords.y};
+                                    let insertIndex = topPoints.findIndex(p => p.x > newPoint.x);
+                                    if (insertIndex === -1) insertIndex = topPoints.length;
+                                    topPoints.splice(insertIndex, 0, newPoint);
+                                    renderControls();
+                                    updateGraphics();
+                                    } else if (coords.x < 50 && coords.y > 0 && coords.y < 100) {
+                                            let newPoint = {x: coords.x, y: coords.y};
+                                            let insertIndex = leftPoints.findIndex(p => p.y > newPoint.y);
+                                            if (insertIndex === -1) insertIndex = leftPoints.length;
+                                            leftPoints.splice(insertIndex, 0, newPoint);
+                                            renderControls();
+                                            updateGraphics();
+                                            }
+                                            }
+
+                                            function updateGraphics() {
+                                            updatePath();
+                                            controlCircles.forEach(cc => {
+                                            cc.circle.setAttribute("cx", cc.point.x);
+                                            cc.circle.setAttribute("cy", cc.point.y);
+                                            });
+                                            }
+
+                                            function randomize() {
+                                            topPoints = [];
+                                            leftPoints = [];
+                                            let numTop = Math.floor(Math.random() * 3) + 1;
+                                            let numLeft = Math.floor(Math.random() * 3) + 1;
+                                            for (let i = 0; i < numTop; i++) {
+                                                topPoints.push({ x: (i + 1) * (100 / (numTop + 1)) + (Math.random() - 0.5) * 10, y: Math.random() * 80 - 90 });
+                                                }
+                                                for (let i = 0; i < numLeft; i++) {
+                                                    leftPoints.push({ x: Math.random() * 80 - 90, y: (i + 1) * (100 / (numLeft + 1)) + (Math.random() - 0.5) * 10 });
+                                                    }
+                                                    renderControls();
+                                                    updateGraphics();
+                                                    }
+
+                                                    // --- Initialisation ---
+                                                    initUI();
+                                                    updatePath();
+                                                    generateTessellation();
+                                                    updateColors(); // Synchronise les couleurs au démarrage
+
+                                                    ]]>
+                                                </script>
+                                            </svg>
