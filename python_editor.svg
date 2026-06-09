@@ -1,0 +1,157 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="#2c3e50" />
+  <text x="20" y="35" font-family="Arial, sans-serif" font-size="20" fill="#ecf0f1" font-weight="bold">Python Brython Editor (SVG/ECMAScript)</text>
+  
+  <foreignObject x="20" y="50" width="760" height="530">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; height: 100%; display: flex; flex-direction: column; gap: 12px; color: #ecf0f1;">
+      
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.12.1/brython.min.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.12.1/brython_stdlib.min.js"></script>
+      
+      <style>
+        .container {
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          gap: 10px;
+        }
+        #editor {
+          width: 100%;
+          height: 220px;
+          background-color: #1e1e1e;
+          color: #dcdcdc;
+          font-family: 'Consolas', 'Monaco', monospace;
+          font-size: 14px;
+          padding: 12px;
+          border: 1px solid #444;
+          border-radius: 6px;
+          box-sizing: border-box;
+          resize: none;
+          outline: none;
+        }
+        #editor:focus {
+          border-color: #3498db;
+        }
+        .controls {
+          display: flex;
+          gap: 10px;
+          align-items: center;
+        }
+        #run-btn {
+          padding: 8px 24px;
+          background-color: #27ae60;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: bold;
+          transition: background-color 0.2s;
+        }
+        #run-btn:hover {
+          background-color: #2ecc71;
+        }
+        #clear-btn {
+          padding: 8px 16px;
+          background-color: #7f8c8d;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 14px;
+        }
+        #output-container {
+          flex-grow: 1;
+          background-color: #000;
+          border: 1px solid #444;
+          border-radius: 6px;
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
+        }
+        .output-header {
+          background-color: #333;
+          padding: 4px 12px;
+          font-size: 12px;
+          color: #aaa;
+          border-bottom: 1px solid #444;
+        }
+        #output {
+          flex-grow: 1;
+          color: #00ff00;
+          font-family: 'Consolas', 'Monaco', monospace;
+          font-size: 13px;
+          padding: 10px;
+          overflow-y: auto;
+          white-space: pre-wrap;
+          word-break: break-all;
+        }
+      </style>
+
+      <div class="container">
+        <textarea id="editor" spellcheck="false"># Bienvenue dans l'éditeur Python Brython !
+import math
+
+def saluer(nom):
+    return f"Bonjour {nom}, voici un calcul : {math.pi:.4f}"
+
+print(saluer("Utilisateur"))
+
+for i in range(1, 4):
+    print(f"Itération numéro {i}")
+        </textarea>
+        
+        <div class="controls">
+          <button id="run-btn">Exécuter (Run)</button>
+          <button id="clear-btn">Effacer Console</button>
+        </div>
+        
+        <div id="output-container">
+          <div class="output-header">Console Output</div>
+          <div id="output">Initialisation de Brython...</div>
+        </div>
+      </div>
+
+      <script type="text/python">
+        from browser import document, window, html
+        import sys
+
+        def write_to_output(data):
+            document["output"].text += str(data)
+            document["output"].scrollTop = document["output"].scrollHeight
+
+        class MyOutput:
+            def write(self, data):
+                write_to_output(data)
+            def flush(self):
+                pass
+
+        sys.stdout = MyOutput()
+        sys.stderr = MyOutput()
+
+        def run_code(ev):
+            document["output"].text = ""
+            code = document["editor"].value
+            try:
+                exec(code, {})
+            except Exception as e:
+                document["output"].text += f"\nErreur : {e}"
+
+        def clear_output(ev):
+            document["output"].text = ""
+
+        document["run-btn"].bind("click", run_code)
+        document["clear-btn"].bind("click", clear_output)
+        
+        # Prêt
+        document["output"].text = "Brython est prêt. Cliquez sur 'Exécuter' pour lancer votre code.\n"
+      </script>
+
+      <script type="text/javascript">
+        window.onload = function() {
+          brython();
+        }
+      </script>
+    </div>
+  </foreignObject>
+</svg>
