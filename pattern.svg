@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1200 800" width="100%" height="100%" style="background-color: #1e272e;">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1200 900" width="100%" height="100%" style="background-color: #1e272e;">
 
     <defs>
         <path id="baseTile" d="" />
         <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
             <feDropShadow dx="2" dy="4" stdDeviation="4" flood-color="#000" flood-opacity="0.5"/>
         </filter>
-        <pattern id="forbiddenPattern" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-            <rect width="10" height="10" fill="rgba(255,0,0,0.1)"/>
-            <line x1="0" y1="0" x2="0" y2="10" stroke="rgba(255,0,0,0.3)" stroke-width="2"/>
-        </pattern>
     </defs>
 
     <!-- Zone de pavage -->
@@ -17,315 +13,451 @@
 
     <!-- Interface utilisateur -->
     <g id="uiLayer">
-        <rect x="0" y="0" width="300" height="800" fill="#2d3436" />
+        <rect x="0" y="0" width="300" height="900" fill="#2d3436" />
 
-        <text x="150" y="35" font-family="sans-serif" font-size="22" fill="#dfe6e9" text-anchor="middle" font-weight="bold">Pavage Escher</text>
-        <text x="150" y="60" font-family="sans-serif" font-size="13" fill="#b2bec3" text-anchor="middle">Symétrie Centrale Parfaite</text>
+        <text x="150" y="30" font-family="sans-serif" font-size="20" fill="#dfe6e9" text-anchor="middle" font-weight="bold">Pavage Escher</text>
+        <text x="150" y="50" font-family="sans-serif" font-size="11" fill="#b2bec3" text-anchor="middle">Zéro Chevauchement &amp; Inkscape Ready</text>
+
+        <!-- Sélection du mode -->
+        <g id="modeSelector" transform="translate(15, 60)">
+            <rect id="btnModeSquare" x="0" y="0" width="85" height="35" rx="5" fill="#e17055" style="cursor:pointer"/>
+            <text x="42" y="23" font-family="sans-serif" font-size="11" fill="#fff" text-anchor="middle" font-weight="bold">Carré Trans.</text>
+
+            <rect id="btnModeEscher" x="95" y="0" width="85" height="35" rx="5" fill="#636e72" style="cursor:pointer"/>
+            <text x="137" y="23" font-family="sans-serif" font-size="11" fill="#fff" text-anchor="middle" font-weight="bold">Carré Escher</text>
+
+            <rect id="btnModeHex" x="190" y="0" width="85" height="35" rx="5" fill="#636e72" style="cursor:pointer"/>
+            <text x="232" y="23" font-family="sans-serif" font-size="11" fill="#fff" text-anchor="middle" font-weight="bold">Losange Hex</text>
+        </g>
 
         <!-- Editeur de motif -->
         <g id="editorGroup" transform="translate(150, 210)" filter="url(#shadow)">
             <rect x="-110" y="-110" width="220" height="220" fill="#636e72" rx="5"/>
             <rect x="-100" y="-100" width="200" height="200" fill="#2d3436" rx="2"/>
-            <line x1="50" y1="-100" x2="50" y2="100" stroke="#e17055" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>
-            <line x1="-100" y1="50" x2="100" y2="50" stroke="#e17055" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>
-            <rect x="50" y="50" width="50" height="50" fill="url(#forbiddenPattern)" />
+            <g id="editorGrid"></g>
             <use xlink:href="#baseTile" fill="#00b894" fill-opacity="0.4" stroke="#00b894" stroke-width="2"/>
         </g>
 
-        <!-- Gestion des Couleurs (HTML intégré via foreignObject) -->
-        <foreignObject x="30" y="370" width="240" height="130">
-            <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: sans-serif; color: #dfe6e9; display: flex; flex-direction: column; gap: 12px;">
-
-                <div style="display: flex; justify-content: space-between; align-items: center; background: #636e72; padding: 8px; border-radius: 5px;">
-                    <label style="font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
-                        <input type="color" id="colorA" value="#00b894" style="width: 30px; height: 30px; border: none; cursor: pointer; background: none; padding: 0;"/>
-                        Motif 1
+        <!-- Gestion des Couleurs -->
+        <foreignObject x="30" y="350" width="240" height="180">
+            <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: sans-serif; color: #dfe6e9; display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; align-items: center; background: #636e72; padding: 6px; border-radius: 5px;">
+                    <label style="font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; width:100%;">
+                        <input type="color" id="colorA" value="#00b894" style="width: 24px; height: 24px; border: none; cursor: pointer; background: none; padding: 0;"/>
+                        Couleur 1
                     </label>
                 </div>
-
-                <div style="display: flex; justify-content: space-between; align-items: center; background: #636e72; padding: 8px; border-radius: 5px;">
-                    <label style="font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
-                        <input type="color" id="colorB" value="#0984e3" style="width: 30px; height: 30px; border: none; cursor: pointer; background: none; padding: 0;"/>
-                        Motif 2
+                <div style="display: flex; align-items: center; background: #636e72; padding: 6px; border-radius: 5px;">
+                    <label style="font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; width:100%;">
+                        <input type="color" id="colorB" value="#0984e3" style="width: 24px; height: 24px; border: none; cursor: pointer; background: none; padding: 0;"/>
+                        Couleur 2
                     </label>
                 </div>
-
-                <div style="display: flex; justify-content: space-between; align-items: center; background: #636e72; padding: 8px; border-radius: 5px;">
-                    <label style="font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
-                        <input type="color" id="colorStroke" value="#1e272e" style="width: 30px; height: 30px; border: none; cursor: pointer; background: none; padding: 0;"/>
+                <div id="colorCContainer" style="display: none; align-items: center; background: #636e72; padding: 6px; border-radius: 5px;">
+                    <label style="font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; width:100%;">
+                        <input type="color" id="colorC" value="#fdcb6e" style="width: 24px; height: 24px; border: none; cursor: pointer; background: none; padding: 0;"/>
+                        Couleur 3 (Hex)
+                    </label>
+                </div>
+                <div style="display: flex; align-items: center; background: #636e72; padding: 6px; border-radius: 5px;">
+                    <label style="font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; width:100%;">
+                        <input type="color" id="colorStroke" value="#1e272e" style="width: 24px; height: 24px; border: none; cursor: pointer; background: none; padding: 0;"/>
                         Contour
                     </label>
                 </div>
-
             </div>
         </foreignObject>
 
         <!-- Instructions -->
-        <text x="150" y="540" font-family="sans-serif" font-size="13" fill="#dfe6e9" text-anchor="middle" font-weight="bold">Double-clic vide : Ajouter point</text>
-        <text x="150" y="560" font-family="sans-serif" font-size="13" fill="#dfe6e9" text-anchor="middle" font-weight="bold">Double-clic point : Supprimer</text>
-        <text x="150" y="590" font-family="sans-serif" font-size="12" fill="#e17055" text-anchor="middle">(La zone hachurée est interdite</text>
-        <text x="150" y="605" font-family="sans-serif" font-size="12" fill="#e17055" text-anchor="middle">pour éviter les chevauchements)</text>
+        <text x="150" y="570" font-family="sans-serif" font-size="12" fill="#dfe6e9" text-anchor="middle" font-weight="bold">Double-clic : Ajouter/Supprimer</text>
+        <text x="150" y="590" font-family="sans-serif" font-size="11" fill="#b2bec3" text-anchor="middle" id="instructionText">Les zones rouges sont interdites.</text>
 
-        <!-- Bouton Aléatoire -->
+        <!-- Boutons d'actions -->
         <g id="btnRandom" style="cursor: pointer;">
-            <rect x="50" y="630" width="200" height="40" rx="8" fill="#e17055"/>
-            <text x="150" y="656" font-family="sans-serif" font-size="16" fill="#fff" text-anchor="middle" font-weight="bold">Motif Aléatoire</text>
+            <rect x="20" y="620" width="260" height="40" rx="8" fill="#e17055"/>
+            <text x="150" y="646" font-family="sans-serif" font-size="15" fill="#fff" text-anchor="middle" font-weight="bold">Motif Aléatoire</text>
+        </g>
+
+        <g id="btnExport" style="cursor: pointer;">
+            <rect x="20" y="675" width="260" height="40" rx="8" fill="#6c5ce7"/>
+            <text x="150" y="701" font-family="sans-serif" font-size="15" fill="#fff" text-anchor="middle" font-weight="bold">Télécharger SVG (Paths)</text>
         </g>
     </g>
 
     <script type="text/ecmascript">
         <![CDATA[
         const svgNS = "http://www.w3.org/2000/svg";
+        const xhtmlNS = "http://www.w3.org/1999/xhtml";
         const svg = document.querySelector("svg");
         const editorGroup = document.getElementById("editorGroup");
+        const editorGrid = document.getElementById("editorGrid");
         const tessGroup = document.getElementById("tessGroup");
         const baseTilePath = document.getElementById("baseTile");
         const btnRandom = document.getElementById("btnRandom");
+        const btnExport = document.getElementById("btnExport");
+        const btnModeSquare = document.getElementById("btnModeSquare");
+        const btnModeEscher = document.getElementById("btnModeEscher");
+        const btnModeHex = document.getElementById("btnModeHex");
+        const colorCContainer = document.getElementById("colorCContainer");
+        const instructionText = document.getElementById("instructionText");
 
-        // Références aux sélecteurs de couleur HTML
         const colorAInput = document.getElementById("colorA");
         const colorBInput = document.getElementById("colorB");
+        const colorCInput = document.getElementById("colorC");
         const colorStrokeInput = document.getElementById("colorStroke");
 
-        const TILE_SIZE = 100;
-        const COLS = 10;
-        const ROWS = 9;
+        const ROWS = 12, COLS = 12;
+        let COLORS, STROKE_COLOR;
 
-        // Couleurs par défaut
-        let COLORS = [colorAInput.value, colorBInput.value];
-        let STROKE_COLOR = colorStrokeInput.value;
+        let currentMode = 'square';
 
-        let topPoints = [
-        { x: 25, y: -20 },
-        { x: 50, y: -30 },
-        { x: 75, y: -20 }
-        ];
+        let topPoints = [ {x:25, y:-20}, {x:50, y:-30}, {x:75, y:-20} ];
+        let leftPoints = [ {x:-20, y:25}, {x:-30, y:50}, {x:-20, y:75} ];
 
-        let leftPoints = [
-        { x: -20, y: 25 },
-        { x: -30, y: 50 },
-        { x: -20, y: 75 }
-        ];
+        let escherTopPoints = [ {x:25, y:-20}, {x:50, y:-30}, {x:75, y:-20} ];
+        let escherRightPoints = [ {x:120, y:25}, {x:130, y:50}, {x:120, y:75} ];
+
+        let edge0Points = [ {x:0, y:-50}, {x:28.8, y:-33.3}, {x:57.7, y:-16.6}, {x:86.6, y:0} ];
+        let edge1Points = [ {x:86.6, y:0}, {x:57.7, y:16.6}, {x:28.8, y:33.3}, {x:0, y:50} ];
 
         let controlCircles = [];
         let draggingPoint = null;
 
-        // --- Génération du Chemin ---
-
-        function buildSmoothClosedPath(points) {
+        function buildClampedClosedPath(points, segmentsBounds) {
         let n = points.length;
-        if (n < 2) return `M ${points[0].x} ${points[0].y} L ${points[0].x} ${points[0].y} Z`;
+        if (n < 2) return `M ${points[0].x} ${points[0].y} Z`;
             let d = `M ${points[0].x} ${points[0].y} `;
             for (let i = 0; i < n; i++) {
-                let p0 = points[(i - 1 + n) % n];
-                let p1 = points[i];
-                let p2 = points[(i + 1) % n];
-                let p3 = points[(i + 2) % n];
+                let p0 = points[(i - 1 + n) % n], p1 = points[i], p2 = points[(i + 1) % n], p3 = points[(i + 2) % n];
                 let cp1x = p1.x + (p2.x - p0.x) / 6;
                 let cp1y = p1.y + (p2.y - p0.y) / 6;
                 let cp2x = p2.x - (p3.x - p1.x) / 6;
                 let cp2y = p2.y - (p3.y - p1.y) / 6;
+
+                let b = segmentsBounds ? segmentsBounds[i] : null;
+                if (b) {
+                cp1x = Math.max(b.minX || -Infinity, Math.min(b.maxX || Infinity, cp1x));
+                cp1y = Math.max(b.minY || -Infinity, Math.min(b.maxY || Infinity, cp1y));
+                cp2x = Math.max(b.minX || -Infinity, Math.min(b.maxX || Infinity, cp2x));
+                cp2y = Math.max(b.minY || -Infinity, Math.min(b.maxY || Infinity, cp2y));
+                }
+
                 d += `C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y} `;
                 }
                 return d + "Z";
                 }
 
                 function updatePath() {
-                const TL = { x: 0, y: 0 };
-                const TR = { x: 100, y: 0 };
-                const BR = { x: 100, y: 100 };
-                const BL = { x: 0, y: 100 };
-                let rightPoints = leftPoints.map(p => ({ x: 100 - p.x, y: 100 - p.y })).reverse();
-                let bottomPoints = topPoints.map(p => ({ x: 100 - p.x, y: 100 - p.y })).reverse();
-                let leftPointsReversed = [...leftPoints].reverse();
-                let perimeterPoints = [TL, ...topPoints, TR, ...rightPoints, BR, ...bottomPoints, BL, ...leftPointsReversed];
-                baseTilePath.setAttribute("d", buildSmoothClosedPath(perimeterPoints));
+                if (currentMode === 'square') updateSquarePath();
+                else if (currentMode === 'escher') updateEscherPath();
+                else updateHexPath();
                 }
 
-                // --- Génération du Pavage ---
-                function generateTessellation() {
-                while (tessGroup.firstChild) tessGroup.removeChild(tessGroup.firstChild);
-                for (let i = -1; i < COLS; i++) {
-                    for (let j = -1; j < ROWS; j++) {
-                        let use = document.createElementNS(svgNS, "use");
-                        use.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", "#baseTile");
-                        use.setAttribute("x", i * TILE_SIZE);
-                        use.setAttribute("y", j * TILE_SIZE);
+                function updateSquarePath() {
+                const TL = {x:0, y:0}, TR = {x:100, y:0}, BR = {x:100, y:100}, BL = {x:0, y:100};
+                let topPts = [TL, ...topPoints, TR];
+                let rightPts = [TR, ...leftPoints.map(p => ({x:100+p.x, y:p.y})).reverse(), BR];
+                let bottomPts = [BR, ...topPoints.map(p => ({x:p.x, y:100+p.y})).reverse(), BL];
+                let leftPts = [BL, ...leftPoints, TL];
 
-                        let colorIndex = (Math.abs(i) + Math.abs(j)) % 2;
-                        use.dataset.colorIndex = colorIndex; // Stocke l'index pour MAJ rapide des couleurs
+                let perimeterPoints = [...topPts, ...rightPts.slice(1), ...bottomPts.slice(1), ...leftPts.slice(1)];
+                let bounds = [];
 
-                        use.setAttribute("fill", COLORS[colorIndex]);
-                        use.setAttribute("stroke", STROKE_COLOR);
-                        use.setAttribute("stroke-width", "2");
-                        use.setAttribute("stroke-linejoin", "round");
+                for(let i=0; i<topPts.length-1; i++) bounds.push({maxY: 49});
+                    for(let i=0; i<rightPts.length-1; i++) bounds.push({minX: 51});
+                        for(let i=0; i<bottomPts.length-1; i++) bounds.push({minY: 51});
+                            for(let i=0; i<leftPts.length-1; i++) bounds.push({maxX: 49});
 
-                        tessGroup.appendChild(use);
-                        }
-                        }
-                        }
+                                baseTilePath.setAttribute("d", buildClampedClosedPath(perimeterPoints, bounds));
+                                }
 
-                        // --- Mise à jour des couleurs sans régénérer la grille ---
-                        function updateColors() {
-                        COLORS = [colorAInput.value, colorBInput.value];
-                        STROKE_COLOR = colorStrokeInput.value;
+                                function updateEscherPath() {
+                                const TL = {x:0, y:0}, TR = {x:100, y:0}, BR = {x:100, y:100}, BL = {x:0, y:100};
+                                let topPts = [TL, ...escherTopPoints, TR];
+                                let rightPts = [TR, ...escherRightPoints, BR];
+                                let bottomPts = [BR, ...escherTopPoints.map(p => ({x:100-p.x, y:100-p.y})).reverse(), BL];
+                                let leftPts = [BL, ...escherRightPoints.map(p => ({x:100-p.x, y:100-p.y})), TL];
 
-                        // Met à jour l'aperçu dans l'éditeur
-                        let editorPreview = editorGroup.querySelector("use");
-                        editorPreview.setAttribute("fill", COLORS[0]); // Utilise la couleur A pour l'aperçu
-                        editorPreview.setAttribute("stroke", STROKE_COLOR);
+                                let perimeterPoints = [...topPts, ...rightPts.slice(1), ...bottomPts.slice(1), ...leftPts.slice(1)];
+                                let bounds = [];
 
-                        // Met à jour toutes les tuiles du pavage
-                        let tiles = tessGroup.children;
-                        for (let i = 0; i < tiles.length; i++) {
-                            let tile = tiles[i];
-                            let cIndex = tile.dataset.colorIndex;
-                            tile.setAttribute("fill", COLORS[cIndex]);
-                            tile.setAttribute("stroke", STROKE_COLOR);
-                            }
-                            }
+                                for(let i=0; i<topPts.length-1; i++) bounds.push({maxY: 49});
+                                    for(let i=0; i<rightPts.length-1; i++) bounds.push({minX: 51});
+                                        for(let i=0; i<bottomPts.length-1; i++) bounds.push({minY: 51});
+                                            for(let i=0; i<leftPts.length-1; i++) bounds.push({maxX: 49});
 
-                            // --- Interface et Contrôles ---
-
-                            function renderControls() {
-                            controlCircles.forEach(cc => cc.circle.remove());
-                            controlCircles = [];
-                            topPoints.forEach((p, i) => createControlCircle(p, "top", i));
-                            leftPoints.forEach((p, i) => createControlCircle(p, "left", i));
-                            }
-
-                            function createControlCircle(point, type, index) {
-                            let circle = document.createElementNS(svgNS, "circle");
-                            circle.setAttribute("cx", point.x);
-                            circle.setAttribute("cy", point.y);
-                            circle.setAttribute("r", 7);
-                            circle.setAttribute("fill", "#ffeaa7");
-                            circle.setAttribute("stroke", "#fdcb6e");
-                            circle.setAttribute("stroke-width", "2");
-                            circle.setAttribute("style", "cursor: move;");
-                            circle.classList.add("ctrl-point");
-                            circle.dataset.type = type;
-                            circle.dataset.index = index;
-                            circle.addEventListener("mousedown", startDrag);
-                            circle.addEventListener("touchstart", startDrag, {passive: false});
-                            editorGroup.appendChild(circle);
-                            controlCircles.push({ circle: circle, point: point, type: type, index: index });
-                            }
-
-                            function initUI() {
-                            renderControls();
-
-                            svg.addEventListener("mousemove", drag);
-                            svg.addEventListener("mouseup", endDrag);
-                            svg.addEventListener("mouseleave", endDrag);
-                            svg.addEventListener("touchmove", drag, {passive: false});
-                            svg.addEventListener("touchend", endDrag);
-
-                            editorGroup.addEventListener("dblclick", handleDblClick);
-
-                            btnRandom.addEventListener("click", randomize);
-
-                            // Écouteurs pour les changements de couleur
-                            colorAInput.addEventListener("input", updateColors);
-                            colorBInput.addEventListener("input", updateColors);
-                            colorStrokeInput.addEventListener("input", updateColors);
-                            }
-
-                            function getMousePosition(evt) {
-                            let CTM = editorGroup.getScreenCTM();
-                            let clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
-                            let clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
-                            return { x: (clientX - CTM.e) / CTM.a, y: (clientY - CTM.f) / CTM.d };
-                            }
-
-                            function startDrag(evt) { evt.preventDefault(); draggingPoint = evt.target; }
-
-                            function drag(evt) {
-                            if (!draggingPoint) return;
-                            evt.preventDefault();
-                            let coords = getMousePosition(evt);
-                            let type = draggingPoint.dataset.type;
-                            let index = parseInt(draggingPoint.dataset.index);
-
-                            if (type === "top") {
-                            let minY = -100, maxY = 49;
-                            let minX = index === 0 ? 1 : topPoints[index - 1].x + 1;
-                            let maxX = index === topPoints.length - 1 ? 99 : topPoints[index + 1].x - 1;
-                            topPoints[index].x = Math.max(minX, Math.min(maxX, coords.x));
-                            topPoints[index].y = Math.max(minY, Math.min(maxY, coords.y));
-                            } else {
-                            let minX = -100, maxX = 49;
-                            let minY = index === 0 ? 1 : leftPoints[index - 1].y + 1;
-                            let maxY = index === leftPoints.length - 1 ? 99 : leftPoints[index + 1].y - 1;
-                            leftPoints[index].x = Math.max(minX, Math.min(maxX, coords.x));
-                            leftPoints[index].y = Math.max(minY, Math.min(maxY, coords.y));
-                            }
-                            updateGraphics();
-                            }
-
-                            function endDrag() { draggingPoint = null; }
-
-                            function handleDblClick(evt) {
-                            evt.preventDefault();
-                            let target = evt.target;
-                            if (target.classList.contains("ctrl-point")) {
-                            let type = target.dataset.type;
-                            let index = parseInt(target.dataset.index);
-                            let arr = type === "top" ? topPoints : leftPoints;
-                            if (arr.length > 0) {
-                            arr.splice(index, 1);
-                            renderControls();
-                            updateGraphics();
-                            }
-                            return;
-                            }
-                            let coords = getMousePosition(evt);
-                            if (coords.y < 50 && coords.x > 0 && coords.x < 100) {
-                                    let newPoint = {x: coords.x, y: coords.y};
-                                    let insertIndex = topPoints.findIndex(p => p.x > newPoint.x);
-                                    if (insertIndex === -1) insertIndex = topPoints.length;
-                                    topPoints.splice(insertIndex, 0, newPoint);
-                                    renderControls();
-                                    updateGraphics();
-                                    } else if (coords.x < 50 && coords.y > 0 && coords.y < 100) {
-                                            let newPoint = {x: coords.x, y: coords.y};
-                                            let insertIndex = leftPoints.findIndex(p => p.y > newPoint.y);
-                                            if (insertIndex === -1) insertIndex = leftPoints.length;
-                                            leftPoints.splice(insertIndex, 0, newPoint);
-                                            renderControls();
-                                            updateGraphics();
-                                            }
-                                            }
-
-                                            function updateGraphics() {
-                                            updatePath();
-                                            controlCircles.forEach(cc => {
-                                            cc.circle.setAttribute("cx", cc.point.x);
-                                            cc.circle.setAttribute("cy", cc.point.y);
-                                            });
-                                            }
-
-                                            function randomize() {
-                                            topPoints = [];
-                                            leftPoints = [];
-                                            let numTop = Math.floor(Math.random() * 3) + 1;
-                                            let numLeft = Math.floor(Math.random() * 3) + 1;
-                                            for (let i = 0; i < numTop; i++) {
-                                                topPoints.push({ x: (i + 1) * (100 / (numTop + 1)) + (Math.random() - 0.5) * 10, y: Math.random() * 80 - 90 });
+                                                baseTilePath.setAttribute("d", buildClampedClosedPath(perimeterPoints, bounds));
                                                 }
-                                                for (let i = 0; i < numLeft; i++) {
-                                                    leftPoints.push({ x: Math.random() * 80 - 90, y: (i + 1) * (100 / (numLeft + 1)) + (Math.random() - 0.5) * 10 });
-                                                    }
-                                                    renderControls();
-                                                    updateGraphics();
-                                                    }
 
-                                                    // --- Initialisation ---
-                                                    initUI();
-                                                    updatePath();
-                                                    generateTessellation();
-                                                    updateColors(); // Synchronise les couleurs au démarrage
+                                                function updateHexPath() {
+                                                let e0 = edge0Points;
+                                                let e1 = edge1Points;
+                                                let e2 = e0.map(p => ({x: p.x - 86.6, y: p.y + 50})).reverse();
+                                                let e3 = e1.map(p => ({x: p.x - 86.6, y: p.y - 50})).reverse();
 
-                                                    ]]>
-                                                </script>
-                                            </svg>
+                                                let perimeterPoints = [...e0, ...e1.slice(1), ...e2.slice(1), ...e3.slice(1)];
+                                                let bounds = [];
+
+                                                for(let i=0; i<e0.length-1; i++) bounds.push({minX: 0, maxY: 0});
+                                                    for(let i=0; i<e1.length-1; i++) bounds.push({minX: 0, minY: 0});
+                                                        for(let i=0; i<e2.length-1; i++) bounds.push({maxX: 0, minY: 0});
+                                                            for(let i=0; i<e3.length-1; i++) bounds.push({maxX: 0, maxY: 0});
+
+                                                                baseTilePath.setAttribute("d", buildClampedClosedPath(perimeterPoints, bounds));
+                                                                }
+
+                                                                function generateTessellation() {
+                                                                while (tessGroup.firstChild) tessGroup.removeChild(tessGroup.firstChild);
+                                                                if (currentMode === 'square' || currentMode === 'escher') genSquareTess();
+                                                                else genHexTess();
+                                                                }
+
+                                                                function genSquareTess() {
+                                                                for (let i = -1; i < COLS; i++) {
+                                                                    for (let j = -1; j < ROWS; j++) {
+                                                                        let use = document.createElementNS(svgNS, "use");
+                                                                        use.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", "#baseTile");
+                                                                        use.setAttribute("x", i * 100); use.setAttribute("y", j * 100);
+                                                                        use.dataset.colorIndex = (Math.abs(i) + Math.abs(j)) % 2;
+                                                                        tessGroup.appendChild(use);
+                                                                        }
+                                                                        }
+                                                                        }
+
+                                                                        function genHexTess() {
+                                                                        for (let j = -1; j < ROWS; j++) {
+                                                                            for (let i = -1; i < COLS; i++) {
+                                                                                let use = document.createElementNS(svgNS, "use");
+                                                                                use.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", "#baseTile");
+                                                                                use.setAttribute("x", i * 86.6 + j * (-86.6)); use.setAttribute("y", i * 50 + j * 50);
+                                                                                use.dataset.colorIndex = (((i - j) % 3) + 3) % 3;
+                                                                                tessGroup.appendChild(use);
+                                                                                }
+                                                                                }
+                                                                                }
+
+                                                                                function updateColors() {
+                                                                                COLORS = [colorAInput.value, colorBInput.value, colorCInput.value];
+                                                                                STROKE_COLOR = colorStrokeInput.value;
+                                                                                editorGroup.querySelector("use").setAttribute("fill", COLORS[0]);
+                                                                                editorGroup.querySelector("use").setAttribute("stroke", STROKE_COLOR);
+                                                                                let tiles = tessGroup.children;
+                                                                                for (let i = 0; i < tiles.length; i++) {
+                                                                                    tiles[i].setAttribute("fill", COLORS[parseInt(tiles[i].dataset.colorIndex)]);
+                                                                                    tiles[i].setAttribute("stroke", STROKE_COLOR);
+                                                                                    tiles[i].setAttribute("stroke-width", "2");
+                                                                                    tiles[i].setAttribute("stroke-linejoin", "round");
+                                                                                    }
+                                                                                    }
+
+                                                                                    function drawEditorGrid() {
+                                                                                    while (editorGrid.firstChild) editorGrid.removeChild(editorGrid.firstChild);
+                                                                                    if (currentMode === 'square') {
+                                                                                    let r1 = document.createElementNS(svgNS, "rect"); r1.setAttribute("x","50"); r1.setAttribute("y","0"); r1.setAttribute("width","50"); r1.setAttribute("height","100"); r1.setAttribute("fill","rgba(255,0,0,0.1)");
+                                                                                    let r2 = document.createElementNS(svgNS, "rect"); r2.setAttribute("x","0"); r2.setAttribute("y","50"); r2.setAttribute("width","100"); r2.setAttribute("height","50"); r2.setAttribute("fill","rgba(255,0,0,0.1)");
+                                                                                    editorGrid.appendChild(r1); editorGrid.appendChild(r2);
+                                                                                    instructionText.textContent = "Restez dans le quart Haut-Gauche.";
+                                                                                    } else if (currentMode === 'escher') {
+                                                                                    let r1 = document.createElementNS(svgNS, "rect"); r1.setAttribute("x","0"); r1.setAttribute("y","50"); r1.setAttribute("width","100"); r1.setAttribute("height","50"); r1.setAttribute("fill","rgba(255,0,0,0.1)");
+                                                                                    let r2 = document.createElementNS(svgNS, "rect"); r2.setAttribute("x","0"); r2.setAttribute("y","0"); r2.setAttribute("width","50"); r2.setAttribute("height","100"); r2.setAttribute("fill","rgba(255,0,0,0.1)");
+                                                                                    editorGrid.appendChild(r1); editorGrid.appendChild(r2);
+                                                                                    instructionText.textContent = "Editez Haut et Droite. Rotation 180°.";
+                                                                                    } else {
+                                                                                    let p1 = document.createElementNS(svgNS, "polygon"); p1.setAttribute("points", "0,0 86.6,0 0,-50"); p1.setAttribute("fill","rgba(255,0,0,0.1)");
+                                                                                    let p2 = document.createElementNS(svgNS, "polygon"); p2.setAttribute("points", "0,0 86.6,0 0,50"); p2.setAttribute("fill","rgba(255,0,0,0.1)");
+                                                                                    editorGrid.appendChild(p1); editorGrid.appendChild(p2);
+                                                                                    instructionText.textContent = "Restez dans les quadrants Droite.";
+                                                                                    }
+                                                                                    }
+
+                                                                                    function setMode(mode) {
+                                                                                    currentMode = mode;
+                                                                                    btnModeSquare.setAttribute("fill", mode === 'square' ? '#e17055' : '#636e72');
+                                                                                    btnModeEscher.setAttribute("fill", mode === 'escher' ? '#e17055' : '#636e72');
+                                                                                    btnModeHex.setAttribute("fill", mode === 'hex' ? '#e17055' : '#636e72');
+                                                                                    colorCContainer.style.display = mode === 'hex' ? 'flex' : 'none';
+                                                                                    drawEditorGrid();
+                                                                                    renderControls();
+                                                                                    updatePath();
+                                                                                    generateTessellation();
+                                                                                    updateColors();
+                                                                                    }
+
+                                                                                    function renderControls() {
+                                                                                    controlCircles.forEach(cc => cc.circle.remove());
+                                                                                    controlCircles = [];
+                                                                                    if (currentMode === 'square') {
+                                                                                    topPoints.forEach((p, i) => createControlCircle(p, "top", i));
+                                                                                    leftPoints.forEach((p, i) => createControlCircle(p, "left", i));
+                                                                                    } else if (currentMode === 'escher') {
+                                                                                    escherTopPoints.forEach((p, i) => createControlCircle(p, "etop", i));
+                                                                                    escherRightPoints.forEach((p, i) => createControlCircle(p, "eright", i));
+                                                                                    } else {
+                                                                                    edge0Points.forEach((p, i) => createControlCircle(p, "edge0", i));
+                                                                                    edge1Points.forEach((p, i) => createControlCircle(p, "edge1", i));
+                                                                                    }
+                                                                                    }
+
+                                                                                    function createControlCircle(point, type, index) {
+                                                                                    let circle = document.createElementNS(svgNS, "circle");
+                                                                                    circle.setAttribute("cx", point.x); circle.setAttribute("cy", point.y);
+                                                                                    circle.setAttribute("r", 7); circle.setAttribute("fill", "#ffeaa7"); circle.setAttribute("stroke", "#fdcb6e"); circle.setAttribute("stroke-width", "2");
+                                                                                    circle.setAttribute("style", "cursor: move;"); circle.classList.add("ctrl-point");
+                                                                                    circle.dataset.type = type; circle.dataset.index = index;
+                                                                                    circle.addEventListener("mousedown", startDrag);
+                                                                                    circle.addEventListener("touchstart", startDrag, {passive: false});
+                                                                                    editorGroup.appendChild(circle);
+                                                                                    controlCircles.push({ circle: circle, point: point, type: type, index: index });
+                                                                                    }
+
+                                                                                    function initUI() {
+                                                                                    svg.addEventListener("mousemove", drag); svg.addEventListener("mouseup", endDrag); svg.addEventListener("mouseleave", endDrag);
+                                                                                    svg.addEventListener("touchmove", drag, {passive: false}); svg.addEventListener("touchend", endDrag);
+                                                                                    editorGroup.addEventListener("dblclick", handleDblClick);
+                                                                                    btnModeSquare.addEventListener("click", () => setMode('square'));
+                                                                                    btnModeEscher.addEventListener("click", () => setMode('escher'));
+                                                                                    btnModeHex.addEventListener("click", () => setMode('hex'));
+                                                                                    btnRandom.addEventListener("click", randomize);
+                                                                                    btnExport.addEventListener("click", exportSVG);
+                                                                                    [colorAInput, colorBInput, colorCInput, colorStrokeInput].forEach(input => input.addEventListener("input", updateColors));
+                                                                                    }
+
+                                                                                    function getMousePosition(evt) {
+                                                                                    let CTM = editorGroup.getScreenCTM();
+                                                                                    let clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+                                                                                    let clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+                                                                                    return { x: (clientX - CTM.e) / CTM.a, y: (clientY - CTM.f) / CTM.d };
+                                                                                    }
+
+                                                                                    function startDrag(evt) { evt.preventDefault(); draggingPoint = evt.target; }
+
+                                                                                    function drag(evt) {
+                                                                                    if (!draggingPoint) return; evt.preventDefault();
+                                                                                    let coords = getMousePosition(evt);
+                                                                                    let type = draggingPoint.dataset.type;
+                                                                                    let index = parseInt(draggingPoint.dataset.index);
+                                                                                    let arr = type === 'top' ? topPoints : (type === 'left' ? leftPoints : (type === 'etop' ? escherTopPoints : (type === 'eright' ? escherRightPoints : (type === 'edge0' ? edge0Points : edge1Points))));
+
+                                                                                    if (currentMode === 'square') {
+                                                                                    if (type === "top") { let minX = index === 0 ? 1 : arr[index - 1].x + 1; let maxX = index === arr.length - 1 ? 99 : arr[index + 1].x - 1; arr[index].x = Math.max(minX, Math.min(maxX, coords.x)); arr[index].y = Math.min(49, coords.y); }
+                                                                                    else if (type === 'left') { let minY = index === 0 ? 1 : arr[index - 1].y + 1; let maxY = index === arr.length - 1 ? 99 : arr[index + 1].y - 1; arr[index].x = Math.min(49, coords.x); arr[index].y = Math.max(minY, Math.min(maxY, coords.y)); }
+                                                                                    } else if (currentMode === 'escher') {
+                                                                                    if (type === 'etop') { let minX = index === 0 ? 1 : arr[index - 1].x + 1; let maxX = index === arr.length - 1 ? 99 : arr[index + 1].x - 1; arr[index].x = Math.max(minX, Math.min(maxX, coords.x)); arr[index].y = Math.min(49, coords.y); }
+                                                                                    else if (type === 'eright') { let minY = index === 0 ? 1 : arr[index - 1].y + 1; let maxY = index === arr.length - 1 ? 99 : arr[index + 1].y - 1; arr[index].x = Math.max(51, coords.x); arr[index].y = Math.max(minY, Math.min(maxY, coords.y)); }
+                                                                                    } else {
+                                                                                    arr[index].x = coords.x; arr[index].y = coords.y;
+                                                                                    if (type === 'edge0') { arr[index].y = Math.min(-1, coords.y); arr[index].x = Math.max(1, coords.x); }
+                                                                                    else if (type === 'edge1') { arr[index].y = Math.max(1, coords.y); arr[index].x = Math.max(1, coords.x); }
+                                                                                    }
+                                                                                    updateGraphics();
+                                                                                    }
+
+                                                                                    function endDrag() { draggingPoint = null; }
+
+                                                                                    function handleDblClick(evt) {
+                                                                                    evt.preventDefault(); let target = evt.target; let arr, type;
+                                                                                    if (target.classList.contains("ctrl-point")) {
+                                                                                    type = target.dataset.type;
+                                                                                    arr = type === 'top' ? topPoints : (type === 'left' ? leftPoints : (type === 'etop' ? escherTopPoints : (type === 'eright' ? escherRightPoints : (type === 'edge0' ? edge0Points : edge1Points))));
+                                                                                    if (arr.length > 0) { arr.splice(parseInt(target.dataset.index), 1); renderControls(); updateGraphics(); } return;
+                                                                                    }
+                                                                                    let coords = getMousePosition(evt);
+                                                                                    if (currentMode === 'square') {
+                                                                                    if (coords.x > 0 && coords.x < 50 && coords.y < 50) { arr = topPoints; type = "top"; let newPoint = {x: coords.x, y: coords.y}; let insertIndex = arr.findIndex(p => p.x > newPoint.x); if (insertIndex === -1) insertIndex = arr.length; arr.splice(insertIndex, 0, newPoint); }
+                                                                                            else if (coords.y > 0 && coords.y < 50 && coords.x < 50) { arr = leftPoints; type = "left"; let newPoint = {x: coords.x, y: coords.y}; let insertIndex = arr.findIndex(p => p.y > newPoint.y); if (insertIndex === -1) insertIndex = arr.length; arr.splice(insertIndex, 0, newPoint); }
+                                                                                                    } else if (currentMode === 'escher') {
+                                                                                                    if (coords.x > 0 && coords.x < 100 && coords.y < 50) { arr = escherTopPoints; type = "etop"; let newPoint = {x: coords.x, y: coords.y}; let insertIndex = arr.findIndex(p => p.x > newPoint.x); if (insertIndex === -1) insertIndex = arr.length; arr.splice(insertIndex, 0, newPoint); }
+                                                                                                            else if (coords.x > 50 && coords.x < 100 && coords.y > 0) { arr = escherRightPoints; type = "eright"; let newPoint = {x: coords.x, y: coords.y}; let insertIndex = arr.findIndex(p => p.y > newPoint.y); if (insertIndex === -1) insertIndex = arr.length; arr.splice(insertIndex, 0, newPoint); }
+                                                                                                                } else {
+                                                                                                                if (coords.x > 0 && coords.y < 0) { arr = edge0Points; let newPoint = {x: coords.x, y: coords.y}; let insertIndex = arr.findIndex(p => p.x > newPoint.x); if (insertIndex === -1) insertIndex = arr.length; arr.splice(insertIndex, 0, newPoint); }
+                                                                                                                    else if (coords.x > 0 && coords.y > 0) { arr = edge1Points; let newPoint = {x: coords.x, y: coords.y}; let insertIndex = arr.findIndex(p => p.x < newPoint.x); if (insertIndex === -1) insertIndex = arr.length; arr.splice(insertIndex, 0, newPoint); }
+                                                                                                                        }
+                                                                                                                        renderControls(); updateGraphics();
+                                                                                                                        }
+
+                                                                                                                        function updateGraphics() { updatePath(); controlCircles.forEach(cc => { cc.circle.setAttribute("cx", cc.point.x); cc.circle.setAttribute("cy", cc.point.y); }); }
+
+                                                                                                                        // --- NOUVELLE FONCTION RANDOMIZE AVEC NOMBRE DE POINTS ALEATOIRE ---
+                                                                                                                        function randomize() {
+                                                                                                                        if (currentMode === 'square') {
+                                                                                                                        topPoints = []; leftPoints = [];
+                                                                                                                        let nT = Math.floor(Math.random() * 6); // 0 à 5 points
+                                                                                                                        let nL = Math.floor(Math.random() * 6);
+                                                                                                                        for (let i = 0; i < nT; i++) topPoints.push({ x: Math.random() * 80 + 10, y: Math.random() * 100 - 70 }); // y de -70 à +30
+                                                                                                                            for (let i = 0; i < nL; i++) leftPoints.push({ x: Math.random() * 100 - 70, y: Math.random() * 80 + 10 }); // x de -70 à +30
+                                                                                                                                topPoints.sort((a, b) => a.x - b.x);
+                                                                                                                                leftPoints.sort((a, b) => a.y - b.y);
+                                                                                                                                } else if (currentMode === 'escher') {
+                                                                                                                                escherTopPoints = []; escherRightPoints = [];
+                                                                                                                                let nT = Math.floor(Math.random() * 6);
+                                                                                                                                let nR = Math.floor(Math.random() * 6);
+                                                                                                                                for (let i = 0; i < nT; i++) escherTopPoints.push({ x: Math.random() * 80 + 10, y: Math.random() * 100 - 70 });
+                                                                                                                                    for (let i = 0; i < nR; i++) escherRightPoints.push({ x: Math.random() * 100 + 60, y: Math.random() * 80 + 10 }); // x de 60 à 160
+                                                                                                                                        escherTopPoints.sort((a, b) => a.x - b.x);
+                                                                                                                                        escherRightPoints.sort((a, b) => a.y - b.y);
+                                                                                                                                        } else {
+                                                                                                                                        // Mode Hex : On conserve les coins mais on génère un nombre aléatoire de points intermédiaires
+                                                                                                                                        let nE0 = Math.floor(Math.random() * 5); // 0 à 4 points
+                                                                                                                                        let nE1 = Math.floor(Math.random() * 5);
+
+                                                                                                                                        edge0Points = [{x:0, y:-50}];
+                                                                                                                                        for (let i = 0; i < nE0; i++) edge0Points.push({ x: Math.random() * 70 + 10, y: -(Math.random() * 30 + 10) }); // x > 0, y < 0
+                                                                                                                                                edge0Points.push({x:86.6, y:0});
+                                                                                                                                                edge0Points.sort((a, b) => a.x - b.x);
+
+                                                                                                                                                edge1Points = [{x:86.6, y:0}];
+                                                                                                                                                for (let i = 0; i < nE1; i++) edge1Points.push({ x: Math.random() * 70 + 10, y: Math.random() * 30 + 10 }); // x > 0, y > 0
+                                                                                                                                                    edge1Points.push({x:0, y:50});
+                                                                                                                                                    edge1Points.sort((a, b) => b.x - a.x); // Tri décroissant sur X pour l'arête basse
+                                                                                                                                                    }
+                                                                                                                                                    renderControls(); updateGraphics();
+                                                                                                                                                    }
+
+                                                                                                                                                    function exportSVG() {
+                                                                                                                                                    const exportSvg = document.createElementNS(svgNS, "svg");
+                                                                                                                                                    exportSvg.setAttribute("xmlns", svgNS);
+                                                                                                                                                    exportSvg.setAttribute("viewBox", "0 0 1000 1000");
+                                                                                                                                                    exportSvg.setAttribute("width", "1000"); exportSvg.setAttribute("height", "1000");
+                                                                                                                                                    const bgRect = document.createElementNS(svgNS, "rect"); bgRect.setAttribute("width", "100%"); bgRect.setAttribute("height", "100%"); bgRect.setAttribute("fill", "#ffffff"); exportSvg.appendChild(bgRect);
+
+                                                                                                                                                    let baseD = baseTilePath.getAttribute("d");
+                                                                                                                                                    COLORS = [colorAInput.value, colorBInput.value, colorCInput.value]; STROKE_COLOR = colorStrokeInput.value;
+
+                                                                                                                                                    if (currentMode === 'square' || currentMode === 'escher') {
+                                                                                                                                                    for (let i = -1; i < COLS; i++) {
+                                                                                                                                                        for (let j = -1; j < ROWS; j++) {
+                                                                                                                                                            let path = document.createElementNS(svgNS, "path");
+                                                                                                                                                            path.setAttribute("d", baseD);
+                                                                                                                                                            path.setAttribute("transform", `translate(${i * 100 + 100}, ${j * 100 + 100})`);
+                                                                                                                                                            let cIndex = (Math.abs(i) + Math.abs(j)) % 2;
+                                                                                                                                                            path.setAttribute("fill", COLORS[cIndex]); path.setAttribute("stroke", STROKE_COLOR); path.setAttribute("stroke-width", "2"); path.setAttribute("stroke-linejoin", "round");
+                                                                                                                                                            exportSvg.appendChild(path);
+                                                                                                                                                            }
+                                                                                                                                                            }
+                                                                                                                                                            } else {
+                                                                                                                                                            for (let j = -1; j < ROWS; j++) {
+                                                                                                                                                                for (let i = -1; i < COLS; i++) {
+                                                                                                                                                                    let path = document.createElementNS(svgNS, "path");
+                                                                                                                                                                    path.setAttribute("d", baseD);
+                                                                                                                                                                    path.setAttribute("transform", `translate(${i * 86.6 + j * (-86.6) + 100}, ${i * 50 + j * 50 + 100})`);
+                                                                                                                                                                    let cIndex = (((i - j) % 3) + 3) % 3;
+                                                                                                                                                                    path.setAttribute("fill", COLORS[cIndex]); path.setAttribute("stroke", STROKE_COLOR); path.setAttribute("stroke-width", "2"); path.setAttribute("stroke-linejoin", "round");
+                                                                                                                                                                    exportSvg.appendChild(path);
+                                                                                                                                                                    }
+                                                                                                                                                                    }
+                                                                                                                                                                    }
+
+                                                                                                                                                                    const serializer = new XMLSerializer();
+                                                                                                                                                                    let svgString = serializer.serializeToString(exportSvg);
+                                                                                                                                                                    if (!svgString.startsWith('<?xml')) svgString = '<?xml version="1.0" encoding="UTF-8"?>\n' + svgString;
+                                                                                                                                                                    const dataUri = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgString);
+                                                                                                                                                                    const a = document.createElementNS(xhtmlNS, "a");
+                                                                                                                                                                    a.href = dataUri; a.download = "pavage_escher_paths.svg";
+                                                                                                                                                                    document.documentElement.appendChild(a); a.click(); document.documentElement.removeChild(a);
+                                                                                                                                                                    }
+
+                                                                                                                                                                    initUI(); setMode('escher');
+
+                                                                                                                                                                    ]]>
+                                                                                                                                                                </script>
+                                                                                                                                                            </svg>
