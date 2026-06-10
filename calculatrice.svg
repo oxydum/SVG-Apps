@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="320" height="450"
+     viewBox="0 0 320 450">
+
+  <title>Calculatrice SVG ECMAScript</title>
+
+  <script type="application/ecmascript"><![CDATA[
+    let expression = "";
+
+    function updateDisplay() {
+      document.getElementById("display").textContent =
+        expression || "0";
+    }
+
+    function press(value) {
+      expression += value;
+      updateDisplay();
+    }
+
+    function clearDisplay() {
+      expression = "";
+      updateDisplay();
+    }
+
+    function calculate() {
+      try {
+        expression = String(eval(expression));
+      } catch(e) {
+        expression = "Erreur";
+      }
+      updateDisplay();
+    }
+  ]]></script>
+
+  <!-- Fond -->
+  <rect x="10" y="10" width="300" height="430"
+        rx="15" ry="15"
+        fill="#dddddd"
+        stroke="#444444"
+        stroke-width="2"/>
+
+  <!-- Écran -->
+  <rect x="20" y="20" width="280" height="60"
+        fill="white"
+        stroke="black"/>
+
+  <text id="display"
+        x="290" y="60"
+        text-anchor="end"
+        font-family="monospace"
+        font-size="28">0</text>
+
+  <!-- Fonction pour dessiner un bouton -->
+  <g font-family="Arial" font-size="20"
+     text-anchor="middle">
+
+    <!-- Ligne 1 -->
+    <g onclick="clearDisplay()">
+      <rect x="20" y="100" width="60" height="50" fill="#ff9999" stroke="black"/>
+      <text x="50" y="133">C</text>
+    </g>
+
+    <g onclick="press('(')">
+      <rect x="90" y="100" width="60" height="50" fill="#eeeeee" stroke="black"/>
+      <text x="120" y="133">(</text>
+    </g>
+
+    <g onclick="press(')')">
+      <rect x="160" y="100" width="60" height="50" fill="#eeeeee" stroke="black"/>
+      <text x="190" y="133">)</text>
+    </g>
+
+    <g onclick="press('/')">
+      <rect x="230" y="100" width="60" height="50" fill="#ffd580" stroke="black"/>
+      <text x="260" y="133">÷</text>
+    </g>
+
+    <!-- Ligne 2 -->
+    <g onclick="press('7')">
+      <rect x="20" y="160" width="60" height="50" fill="white" stroke="black"/>
+      <text x="50" y="193">7</text>
+    </g>
+
+    <g onclick="press('8')">
+      <rect x="90" y="160" width="60" height="50" fill="white" stroke="black"/>
+      <text x="120" y="193">8</text>
+    </g>
+
+    <g onclick="press('9')">
+      <rect x="160" y="160" width="60" height="50" fill="white" stroke="black"/>
+      <text x="190" y="193">9</text>
+    </g>
+
+    <g onclick="press('*')">
+      <rect x="230" y="160" width="60" height="50" fill="#ffd580" stroke="black"/>
+      <text x="260" y="193">×</text>
+    </g>
+
+    <!-- Ligne 3 -->
+    <g onclick="press('4')">
+      <rect x="20" y="220" width="60" height="50" fill="white" stroke="black"/>
+      <text x="50" y="253">4</text>
+    </g>
+
+    <g onclick="press('5')">
+      <rect x="90" y="220" width="60" height="50" fill="white" stroke="black"/>
+      <text x="120" y="253">5</text>
+    </g>
+
+    <g onclick="press('6')">
+      <rect x="160" y="220" width="60" height="50" fill="white" stroke="black"/>
+      <text x="190" y="253">6</text>
+    </g>
+
+    <g onclick="press('-')">
+      <rect x="230" y="220" width="60" height="50" fill="#ffd580" stroke="black"/>
+      <text x="260" y="253">−</text>
+    </g>
+
+    <!-- Ligne 4 -->
+    <g onclick="press('1')">
+      <rect x="20" y="280" width="60" height="50" fill="white" stroke="black"/>
+      <text x="50" y="313">1</text>
+    </g>
+
+    <g onclick="press('2')">
+      <rect x="90" y="280" width="60" height="50" fill="white" stroke="black"/>
+      <text x="120" y="313">2</text>
+    </g>
+
+    <g onclick="press('3')">
+      <rect x="160" y="280" width="60" height="50" fill="white" stroke="black"/>
+      <text x="190" y="313">3</text>
+    </g>
+
+    <g onclick="press('+')">
+      <rect x="230" y="280" width="60" height="50" fill="#ffd580" stroke="black"/>
+      <text x="260" y="313">+</text>
+    </g>
+
+    <!-- Ligne 5 -->
+    <g onclick="press('0')">
+      <rect x="20" y="340" width="130" height="50" fill="white" stroke="black"/>
+      <text x="85" y="373">0</text>
+    </g>
+
+    <g onclick="press('.')">
+      <rect x="160" y="340" width="60" height="50" fill="white" stroke="black"/>
+      <text x="190" y="373">.</text>
+    </g>
+
+    <g onclick="calculate()">
+      <rect x="230" y="340" width="60" height="50" fill="#99ff99" stroke="black"/>
+      <text x="260" y="373">=</text>
+    </g>
+
+  </g>
+
+</svg>
