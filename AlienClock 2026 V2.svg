@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
+
+    <rect width="100%" height="100%" fill="#020208"/>
+
+    <style>
+        :root {
+        --width-off: 1;
+        --width-on: 3;
+        }
+
+        .seg {
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round; /* Arrondit légèrement les pointes des zigzags */
+        stroke-width: var(--width-off);
+
+        /* État Éteint */
+        opacity: 0.1;
+        transform: scale(0.85);
+
+        /* Zoom centré parfait */
+        transform-box: view-box;
+        transform-origin: 400px 400px;
+
+        /* Persistance fluide */
+        transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 1s cubic-bezier(0.4, 0, 0.2, 1),
+        stroke 0.4s ease,
+        stroke-width 0.4s ease,
+        filter 0.8s ease;
+        }
+
+        .seg.on {
+        stroke-width: var(--width-on);
+        /* État Allumé */
+        opacity: 1;
+        transform: scale(1);
+        }
+
+        /* === COULEURS SECONDES (Cyan) === */
+        .s-seg { stroke: #091518; filter: drop-shadow(0 0 0px transparent); }
+        .s-seg.on { stroke: #00f0ff; filter: drop-shadow(0 0 8px #00f0ff); }
+
+        /* === COULEURS MINUTES (Magenta) === */
+        .m-seg { stroke: #180912; filter: drop-shadow(0 0 0px transparent); }
+        .m-seg.on { stroke: #ff2a6d; filter: drop-shadow(0 0 8px #ff2a6d); }
+
+        /* === COULEURS HEURES (Bleu) === */
+        .h-seg { stroke: #0a0a15; filter: drop-shadow(0 0 0px transparent); }
+        .h-seg.on { stroke: #2a4a9a; filter: drop-shadow(0 0 8px #2a4a9a); }
+    </style>
+
+    <!-- ZIGZAG PATHS -->
+    <g>
+
+        <!-- HEURES (Bleu) -->
+        <!-- 15 : Couronne en dents de scie -->
+        <path id="h-15" class="seg h-seg" d="M 445,400 L 426,385 L 422,374 L 400,370 L 378,374 L 374,385 L 355,400 L 374,415 L 378,426 L 400,430 L 422,426 L 426,415 Z" />
+        <!-- 8 : Éclair Diagonal \ -->
+        <path id="h-8"  class="seg h-seg" d="M 360,378 L 375,410 L 390,385 L 400,440 L 410,385 L 425,410 L 440,378" />
+        <!-- 4 : Éclair Diagonal / -->
+        <path id="h-4"  class="seg h-seg" d="M 360,422 L 375,390 L 390,415 L 400,360 L 410,415 L 425,390 L 440,422" />
+        <!-- 2 : Zigzag Horizontal -->
+        <path id="h-2"  class="seg h-seg" d="M 360,400 L 380,385 L 400,415 L 420,385 L 440,400" />
+        <!-- 1 : Zigzag Vertical -->
+        <path id="h-1"  class="seg h-seg" d="M 400,360 L 385,380 L 415,400 L 385,420 L 400,440" />
+
+        <!-- MINUTES (Magenta) -->
+        <!-- 30 : Grande Couronne en dents de scie -->
+        <path id="m-30" class="seg m-seg" d="M 535,400 L 499,342 L 467,283 L 400,285 L 333,283 L 300,342 L 265,400 L 300,458 L 333,517 L 400,515 L 467,517 L 499,458 Z" />
+        <!-- 15 : Petite Couronne en dents de scie -->
+        <path id="m-15" class="seg m-seg" d="M 480,400 L 452,370 L 430,348 L 400,340 L 370,348 L 348,370 L 320,400 L 348,430 L 370,452 L 400,460 L 430,452 L 452,430 Z" />
+        <!-- 8 : Éclair Diagonal \ -->
+        <path id="m-8"  class="seg m-seg" d="M 270,328 L 320,420 L 360,370 L 400,520 L 440,370 L 480,420 L 530,328" />
+        <!-- 4 : Éclair Diagonal / -->
+        <path id="m-4"  class="seg m-seg" d="M 270,472 L 320,380 L 360,430 L 400,280 L 440,430 L 480,380 L 530,472" />
+        <!-- 2 : Onde Horizontale -->
+        <path id="m-2"  class="seg m-seg" d="M 270,400 L 315,380 L 360,420 L 405,380 L 450,420 L 495,380 L 530,400" />
+        <!-- 1 : Onde Verticale -->
+        <path id="m-1"  class="seg m-seg" d="M 400,270 L 380,315 L 420,360 L 380,405 L 420,450 L 380,495 L 400,530" />
+
+        <!-- SECONDES (Cyan) -->
+        <!-- 30 : Grande Couronne en dents de scie -->
+        <path id="s-30" class="seg s-seg" d="M 585,400 L 534,322 L 492,240 L 400,245 L 307,240 L 265,322 L 215,400 L 265,478 L 307,560 L 400,555 L 492,560 L 534,478 Z" />
+        <!-- 15 : Petite Couronne en dents de scie -->
+        <path id="s-15" class="seg s-seg" d="M 515,400 L 478,355 L 457,322 L 400,310 L 343,322 L 322,355 L 285,400 L 322,445 L 343,478 L 400,490 L 457,478 L 478,445 Z" />
+        <!-- 8 : Éclair Diagonal \ -->
+        <path id="s-8"  class="seg s-seg" d="M 220,300 L 290,440 L 350,370 L 400,600 L 450,370 L 510,440 L 580,300" />
+        <!-- 4 : Éclair Diagonal / -->
+        <path id="s-4"  class="seg s-seg" d="M 220,500 L 290,360 L 350,430 L 400,200 L 450,430 L 510,360 L 580,500" />
+        <!-- 2 : Onde Horizontale -->
+        <path id="s-2"  class="seg s-seg" d="M 220,400 L 280,375 L 340,425 L 400,375 L 460,425 L 520,375 L 580,400" />
+        <!-- 1 : Onde Verticale -->
+        <path id="s-1"  class="seg s-seg" d="M 400,220 L 375,280 L 425,340 L 375,400 L 425,460 L 375,520 L 400,580" />
+
+    </g>
+
+    <script type="text/javascript">
+        //<![CDATA[
+
+        const seqH = [15, 8, 4, 2, 1];
+        const seqMS = [30, 15, 8, 4, 2, 1];
+
+        function updatePole(prefix, value, sequence) {
+        let remainder = value;
+
+        sequence.forEach(segmentWeight => {
+        const el = document.getElementById(`${prefix}-${segmentWeight}`);
+        if (!el) return;
+
+        if (remainder >= segmentWeight) {
+        el.classList.add('on');
+        remainder -= segmentWeight;
+        } else {
+        el.classList.remove('on');
+        }
+        });
+        }
+
+        function updateClock() {
+        const now = new Date();
+        updatePole('h', now.getHours(), seqH);
+        updatePole('m', now.getMinutes(), seqMS);
+        updatePole('s', now.getSeconds(), seqMS);
+        }
+
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        //]]>
+    </script>
+
+</svg>
