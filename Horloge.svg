@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="400" height="400"
+     viewBox="0 0 400 400">
+
+    <!-- Styles CSS intégrés au SVG -->
+    <style>
+        svg {
+            background-color: #1a1a2e;
+            filter: drop-shadow(0 0 20px rgba(162, 210, 255, 0.3));
+        }
+    </style>
+
+    <!-- Cadran -->
+    <circle cx="200" cy="200" r="195" fill="#16213e" stroke="#e2e2e2" stroke-width="4"/>
+
+    <!-- Groupe pour les repères (générés par Lodash) -->
+    <g id="ticks-group"></g>
+
+    <!-- Groupe pour les chiffres (générés par Lodash) -->
+    <g id="numbers-group" font-family="Arial, sans-serif" font-size="24" fill="#ffffff" text-anchor="middle" dominant-baseline="central"></g>
+
+    <!-- Aiguilles -->
+    <line id="hour-hand" x1="200" y1="200" x2="200" y2="100" stroke="#ffffff" stroke-width="8" stroke-linecap="round"/>
+    <line id="minute-hand" x1="200" y1="200" x2="200" y2="60" stroke="#a2d2ff" stroke-width="5" stroke-linecap="round"/>
+    <line id="second-hand" x1="200" y1="200" x2="200" y2="40" stroke="#ff6b6b" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- Centre (axe) -->
+    <circle cx="200" cy="200" r="8" fill="#ff6b6b"/>
+    <circle cx="200" cy="200" r="3" fill="#16213e"/>
+
+    <!-- Inclusion de Lodash via XLink -->
+    <script xlink:href="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+
+    <!-- Logique ECMAScript intégrée -->
+    <script type="text/ecmascript"><![CDATA[
+        const SVG_NS = "http://www.w3.org/2000/svg";
+        const CENTER = 200;
+        const RADIUS = 195;
+
+        function initClock() {
+            // Vérification que Lodash est bien chargé (car le chargement externe peut être asynchrone)
+            if (typeof _ === 'undefined') {
+                setTimeout(initClock, 50);
+                return;
+            }
+
+            const ticksGroup = document.getElementById("ticks-group");
+            const numbersGroup = document.getElementById("numbers-group");
+
+            // Génération des 60 repères (minutes/secondes) avec Lodash
+            _.times(60, (i) => {
+                const line = document.createElementNS(SVG_NS, "line");
+                const angle = (i * 6) * (Math.PI / 180);
+
+                const isHour = i % 5 === 0;
+                const outerR = RADIUS - 5;
+                const innerR = isHour ? RADIUS - 25 : RADIUS - 12;
+
+                line.setAttribute("x1", CENTER + innerR * Math.sin(angle));
+                line.setAttribute("y1", CENTER - innerR * Math.cos(angle));
+                line.setAttribute("x2", CENTER + outerR * Math.sin(angle));
+                line.setAttribute("y2", CENTER - outerR * Math.cos(angle));
+                line.setAttribute("stroke", isHour ? "#ffffff" : "#5c6b7f");
+                line.setAttribute("stroke-width", isHour ? 3 : 1);
+
+                ticksGroup.appendChild(line);
+            });
+
+            // Génération des chiffres (1 à 12) avec Lodash
+            _.times(12, (i) => {
+                const text = document.createElementNS(SVG_NS, "text");
+                const num = i + 1;
+                const angle = (num * 30) * (Math.PI / 180);
+                const textR = RADIUS - 45;
+
+                text.setAttribute("x", CENTER + textR * Math.sin(angle));
+                text.setAttribute("y", CENTER - textR * Math.cos(angle));
+                text.textContent = num;
+
+                numbersGroup.appendChild(text);
+            });
+
+            // Lancement de l'animation
+            updateClock();
+        }
+
+        function updateClock() {
+            const hourHand = document.getElementById("hour-hand");
+            const minuteHand = document.getElementById("minute-hand");
+            const secondHand = document.getElementById("second-hand");
+
+            const now = new Date();
+
+            const seconds = now.getSeconds() + now.getMilliseconds() / 1000;
+            const minutes = now.getMinutes() + seconds / 60;
+            const hours = (now.getHours() % 12) + minutes / 60;
+
+            // Utilisation de _.forEach pour mettre à jour les aiguilles
+            _.forEach([
+                { el: secondHand, angle: seconds * 6 },
+                { el: minuteHand, angle: minutes * 6 },
+                { el: hourHand,   angle: hours * 30 }
+            ], ({ el, angle }) => {
+                el.setAttribute("transform", "rotate(" + angle + ", " + CENTER + ", " + CENTER + ")");
+            });
+
+            requestAnimationFrame(updateClock);
+        }
+
+        // Initialisation au chargement du DOM SVG
+        document.addEventListener('DOMContentLoaded', initClock);
+        // Sécurité supplémentaire si le DOM est déjà chargé
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            initClock();
+        }
+    ]]></script>
+
+</svg>
