@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="100%" height="100%" fill="#010208"/>
+
+    <style>
+        :root { --width-off: 1; --width-on: 3; }
+        .seg {
+        fill: none; stroke-linecap: round; stroke-linejoin: round;
+        stroke-width: var(--width-off); opacity: 0.1; transform: scale(0.85);
+        transform-box: view-box; transform-origin: 400px 400px;
+        transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1), opacity 1s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.4s ease, stroke-width 0.4s ease, filter 0.8s ease;
+        }
+        .seg.on { stroke-width: var(--width-on); opacity: 1; transform: scale(1); }
+
+        .s-seg { stroke: #050F05; filter: drop-shadow(0 0 0px transparent); }
+        .s-seg.on { stroke: #39FF14; filter: drop-shadow(0 0 8px #00FF00); } /* Vert Toxique */
+
+        .m-seg { stroke: #100510; filter: drop-shadow(0 0 0px transparent); }
+        .m-seg.on { stroke: #BF40BF; filter: drop-shadow(0 0 8px #9400D3); } /* Violet */
+
+        .h-seg { stroke: #0F0A05; filter: drop-shadow(0 0 0px transparent); }
+        .h-seg.on { stroke: #FFBF00; filter: drop-shadow(0 0 8px #FF8C00); } /* Ambre */
+    </style>
+
+    <g>
+        <!-- HEURES (Ambre) -->
+        <!-- 15 : Fleur à 4 pétales -->
+        <path id="h-15" class="seg h-seg" d="M 400,360 Q 415,400 400,440 Q 385,400 400,360 Z M 360,400 Q 400,415 440,400 Q 400,385 360,400 Z" />
+        <!-- 8 : Vrille \ -->
+        <path id="h-8"  class="seg h-seg" d="M 360,375 C 385,410 415,380 440,415" />
+        <!-- 4 : Vrille / -->
+        <path id="h-4"  class="seg h-seg" d="M 360,425 C 385,390 415,420 440,385" />
+        <!-- 2 : Tige Horizontale charnue -->
+        <path id="h-2"  class="seg h-seg" d="M 360,400 C 370,380 390,380 400,400 C 410,380 430,380 440,400 C 430,420 410,420 400,400 C 390,420 370,420 360,400 Z" />
+        <!-- 1 : Tige Verticale charnue -->
+        <path id="h-1"  class="seg h-seg" d="M 400,360 C 380,370 380,390 400,400 C 380,410 380,430 400,440 C 420,430 420,410 400,400 C 420,390 420,370 400,360 Z" />
+
+        <!-- MINUTES (Violet) -->
+        <!-- 30 : Spore concave (Étoile molle) -->
+        <path id="m-30" class="seg m-seg" d="M 400,270 Q 430,340 530,400 Q 430,460 400,530 Q 370,460 270,400 Q 370,340 400,270 Z" />
+        <!-- 15 : Fleur à 4 pétales -->
+        <path id="m-15" class="seg m-seg" d="M 400,325 Q 430,400 400,475 Q 370,400 400,325 Z M 325,400 Q 400,430 475,400 Q 400,370 325,400 Z" />
+        <!-- 8 : Liane \ -->
+        <path id="m-8"  class="seg m-seg" d="M 270,300 C 350,350 450,350 530,300 C 500,380 420,420 400,500" />
+        <!-- 4 : Liane / -->
+        <path id="m-4"  class="seg m-seg" d="M 270,500 C 350,450 450,450 530,500 C 500,420 420,380 400,300" />
+        <!-- 2 : Tige Horizontale -->
+        <path id="m-2"  class="seg m-seg" d="M 270,400 C 310,370 360,430 400,400 C 440,430 490,370 530,400 C 490,430 440,370 400,400 C 360,370 310,430 270,400 Z" />
+        <!-- 1 : Tige Verticale -->
+        <path id="m-1"  class="seg m-seg" d="M 400,270 C 370,310 430,360 400,400 C 430,440 370,490 400,530 C 430,490 370,440 400,400 C 370,360 430,310 400,270 Z" />
+
+        <!-- SECONDES (Vert Toxique) -->
+        <!-- 30 : Grand Spore concave -->
+        <path id="s-30" class="seg s-seg" d="M 400,220 Q 445,310 580,400 Q 445,490 400,580 Q 355,490 220,400 Q 355,310 400,220 Z" />
+        <!-- 15 : Fleur à 4 pétales -->
+        <path id="s-15" class="seg s-seg" d="M 400,290 Q 445,400 400,510 Q 355,400 400,290 Z M 290,400 Q 400,445 510,400 Q 400,355 290,400 Z" />
+        <!-- 8 : Grande Liane \ -->
+        <path id="s-8"  class="seg s-seg" d="M 220,260 C 350,330 450,280 580,340 C 500,400 480,500 400,600" />
+        <!-- 4 : Grande Liane / -->
+        <path id="s-4"  class="seg s-seg" d="M 220,540 C 350,470 450,520 580,460 C 500,400 480,300 400,200" />
+        <!-- 2 : Grande Tige Horizontale -->
+        <path id="s-2"  class="seg s-seg" d="M 220,400 C 280,360 340,440 400,400 C 460,440 520,360 580,400 C 520,440 460,360 400,400 C 340,440 280,360 220,400 Z" />
+        <!-- 1 : Grande Tige Verticale -->
+        <path id="s-1"  class="seg s-seg" d="M 400,220 C 360,280 440,340 400,400 C 440,460 360,520 400,580 C 440,520 360,460 400,400 C 360,340 440,280 400,220 Z" />
+    </g>
+
+    <script type="text/javascript">
+        //<![CDATA[
+        const seqH = [15, 8, 4, 2, 1]; const seqMS = [30, 15, 8, 4, 2, 1];
+        function updatePole(p, v, s) { let r = v; s.forEach(w => { const e = document.getElementById(`${p}-${w}`); if(!e) return; if(r >= w) { e.classList.add('on'); r -= w; } else { e.classList.remove('on'); } }); }
+        function updateClock() { const n = new Date(); updatePole('h', n.getHours(), seqH); updatePole('m', n.getMinutes(), seqMS); updatePole('s', n.getSeconds(), seqMS); }
+        setInterval(updateClock, 1000); updateClock();
+        //]]>
+    </script>
+</svg>
