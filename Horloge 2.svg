@@ -1,0 +1,199 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-500 -150 1000 300" width="100%" height="100%">
+    <defs>
+        <!-- Dégradé pour l'arrière-plan -->
+        <radialGradient id="bg-grad" cx="50%" cy="50%" r="75%">
+            <stop offset="0%" stop-color="#141a2b" />
+            <stop offset="100%" stop-color="#05070c" />
+        </radialGradient>
+
+        <!-- Filtre de lueur (Glow) pour l'horloge -->
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="4" result="blur1" />
+            <feGaussianBlur stdDeviation="12" result="blur2" />
+            <feMerge>
+                <feMergeNode in="blur2" />
+                <feMergeNode in="blur1" />
+                <feMergeNode in="SourceGraphic" />
+            </feMerge>
+        </filter>
+
+        <style>
+            .seg {
+                fill: #00f0ff; /* Couleur Cyan Néon */
+                stroke: #00f0ff;
+                stroke-width: 1.5;
+                stroke-linejoin: round;
+                transition: fill 0.3s;
+            }
+            .colon {
+                fill: #00f0ff;
+                animation: blink 1s ease-in-out infinite;
+            }
+            @keyframes blink {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.15; }
+            }
+        </style>
+    </defs>
+
+    <!-- Arrière-plan -->
+    <rect x="-500" y="-150" width="1000" height="300" fill="url(#bg-grad)" />
+
+    <!-- Conteneur principal de l'horloge -->
+    <g id="clock" filter="url(#glow)"></g>
+
+    <script type="text/ecmascript"><![CDATA[
+        // Table de vérité des segments pour chaque chiffre (0 à 9)
+        // Ordre: 0:Top, 1:Top-Gauche, 2:Top-Droite, 3:Milieu, 4:Bas-Gauche, 5:Bas-Droite, 6:Bas
+        const digitMap = {
+            '0': [1,1,1,0,1,1,1],
+            '1': [0,0,1,0,0,1,0],
+            '2': [1,0,1,1,1,0,1],
+            '3': [1,0,1,1,0,1,1],
+            '4': [0,1,1,1,0,1,0],
+            '5': [1,1,0,1,0,1,1],
+            '6': [1,1,0,1,1,1,1],
+            '7': [1,0,1,0,0,1,0],
+            '8': [1,1,1,1,1,1,1],
+            '9': [1,1,1,1,0,1,1]
+        };
+
+        // Définition de la position et de l'orientation de chaque segment
+        // Format: [X, Y, Orientation ('h' ou 'v')]
+        const segDefs = [
+            [0, 0, 'h'],   // 0: Top
+            [0, 0, 'v'],   // 1: Top-Gauche
+            [80, 0, 'v'],  // 2: Top-Droite
+            [0, 90, 'h'],  // 3: Milieu
+            [0, 90, 'v'],  // 4: Bas-Gauche
+            [80, 90, 'v'], // 5: Bas-Droite
+            [0, 180, 'h']  // 6: Bas
+        ];
+
+        // Positions horizontales des 6 chiffres (HH:MM:SS)
+        const digitX = [-410, -290, -110, 10, 190, 310];
+        const yOffset = -100; // Centrage vertical
+
+        let segments = []; // Références aux éléments DOM <path>
+        let states = [];   // États d'animation actuels et cibles
+
+        // Fonction pour générer le chemin (path) d'un segment en fonction de son état (0 = effondré, 1 = étendu)
+        function getSegmentPath(x, y, orientation, state) {
+            let p, cx, cy;
+            if (orientation === 'h') {
+                p = [[0,10], [10,0], [90,0], [100,10], [90,20], [10,20]];
+                cx = 50; cy = 10; // Centre du segment horizontal
+            } else {
+                p = [[10,0], [20,10], [20,90], [10,100], [0,90], [0,10]];
+                cx = 10; cy = 50; // Centre du segment vertical
+            }
+            
+            let path = `M`;
+            for(let i=0; i<p.length; i++) {
+                // Interpolation linéaire entre le centre et la position étendue
+                let nx = x + cx + (p[i][0] - cx) * state;
+                let ny = y + cy + (p[i][1] - cy) * state;
+                path += `${i===0?'':'L'}${nx.toFixed(2)} ${ny.toFixed(2)} `;
+            }
+            return path + `Z`;
+        }
+
+        function init() {
+            const svgNS = "http://www.w3.org/2000/svg";
+            const clockGroup = document.getElementById('clock');
+
+            // Création des deux points des ":"
+            const colon1X = -150;
+            const colon2X = 150;
+            const colonY1 = -50;
+            const colonY2 = 50;
+
+            [
+                {x: colon1X, y: colonY1}, {x: colon1X, y: colonY2},
+                {x: colon2X, y: colonY1}, {x: colon2X, y: colonY2}
+            ].forEach(pos => {
+                let c = document.createElementNS(svgNS, 'circle');
+                c.setAttribute('cx', pos.x);
+                c.setAttribute('cy', pos.y);
+                c.setAttribute('r', 12);
+                c.setAttribute('class', 'colon');
+                clockGroup.appendChild(c);
+            });
+
+            // Création des 6 chiffres
+            for(let d=0; d<6; d++) {
+                segments[d] = [];
+                states[d] = [];
+                for(let s=0; s<7; s++) {
+                    let path = document.createElementNS(svgNS, 'path');
+                    path.setAttribute('class', 'seg');
+                    // Initialise les segments en position "effondrée" (état 0)
+                    path.setAttribute('d', getSegmentPath(digitX[d] + segDefs[s][0], segDefs[s][1] + yOffset, segDefs[s][2], 0));
+                    clockGroup.appendChild(path);
+                    segments[d].push(path);
+                    states[d].push({current: 0, target: 0});
+                }
+            }
+
+            // Démarrage de l'horloge
+            updateTime();
+            setInterval(updateTime, 1000);
+            requestAnimationFrame(tick);
+        }
+
+        function updateTime() {
+            let now = new Date();
+            // Formatage HH:MM:SS avec un zéro initial
+            let h = ('0' + now.getHours()).slice(-2);
+            let m = ('0' + now.getMinutes()).slice(-2);
+            let s = ('0' + now.getSeconds()).slice(-2);
+            let timeStr = h + m + s;
+
+            // Assignation des cibles pour le morphing
+            for(let d=0; d<6; d++) {
+                let char = timeStr[d];
+                let segs = digitMap[char];
+                for(let s=0; s<7; s++) {
+                    states[d][s].target = segs[s];
+                }
+            }
+        }
+
+        let lastTime = performance.now();
+        // Boucle d'animation pour le morphing fluide
+        function tick() {
+            let now = performance.now();
+            let dt = now - lastTime;
+            lastTime = now;
+            
+            if (dt > 100) dt = 100; // Empêche les sauts trop grands si l'onglet est inactif
+
+            for(let d=0; d<6; d++) {
+                for(let s=0; s<7; s++) {
+                    let st = states[d][s];
+                    let diff = st.target - st.current;
+                    
+                    // Easing exponentiel : ~80ms pour atteindre la cible
+                    if (Math.abs(diff) > 0.001) {
+                        st.current += diff * Math.min(1, dt / 80);
+                    } else {
+                        st.current = st.target;
+                    }
+                    
+                    // Mise à jour de la forme du segment
+                    let pathStr = getSegmentPath(
+                        digitX[d] + segDefs[s][0], 
+                        segDefs[s][1] + yOffset, 
+                        segDefs[s][2], 
+                        st.current
+                    );
+                    segments[d][s].setAttribute('d', pathStr);
+                }
+            }
+            requestAnimationFrame(tick);
+        }
+        
+        // Initialisation
+        init();
+    ]]></script>
+</svg>

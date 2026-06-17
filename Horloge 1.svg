@@ -1,0 +1,220 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-500 -150 1000 300" width="100%" height="100%">
+    <defs>
+        <!-- Dégradé d'arrière-plan -->
+        <radialGradient id="bg-grad" cx="50%" cy="50%" r="75%">
+            <stop offset="0%" stop-color="#141a2b" />
+            <stop offset="100%" stop-color="#05070c" />
+        </radialGradient>
+
+        <!-- Filtre de lueur standard (pour les éléments statiques) -->
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="6" result="blur1" />
+            <feMerge>
+                <feMergeNode in="blur1" />
+                <feMergeNode in="SourceGraphic" />
+            </feMerge>
+        </filter>
+
+        <!-- Filtre de Morphing (Gooey + Turbulence) -->
+        <filter id="morph_glow" x="-50%" y="-50%" width="200%" height="200%">
+            <!-- 1. Génère un bruit organique -->
+            <feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="2" result="noise" />
+            
+            <!-- 2. Déforme l'image source en utilisant le bruit (l'échelle est animée par JS) -->
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="0" id="morph_disp" result="disp" />
+            
+            <!-- 3. Applique un flou pour préparer l'effet "Gooey" (fusion) -->
+            <feGaussianBlur in="disp" stdDeviation="0" id="morph_blur" result="blur" />
+            
+            <!-- 4. Augmente le contraste de l'alpha pour créer des bords nets et fusionner les gouttes -->
+            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
+            
+            <!-- 5. Rajoute la lueur néon finale par-dessus -->
+            <feGaussianBlur in="goo" stdDeviation="6" result="glow_blur" />
+            <feMerge>
+                <feMergeNode in="glow_blur" />
+                <feMergeNode in="goo" />
+            </feMerge>
+        </filter>
+
+        <!-- Section CSS encapsulée en CDATA pour éviter les erreurs XML avec les caractères spéciaux -->
+        <style><![CDATA[
+            @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@900&display=swap');
+            
+            .digit-text {
+                font-family: 'Raleway', sans-serif;
+                font-size: 160px;
+                font-weight: 900;
+                fill: #00f0ff;
+                text-anchor: middle;
+                dominant-baseline: central;
+                font-variant-numeric: tabular-nums; /* Empêche les chiffres de bouger horizontalement */
+                letter-spacing: -5px;
+            }
+            .colon {
+                fill: #00f0ff;
+                animation: blink 1s ease-in-out infinite;
+            }
+            @keyframes blink {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.15; }
+            }
+        ]]></style>
+    </defs>
+
+    <!-- Arrière-plan -->
+    <rect x="-500" y="-150" width="1000" height="300" fill="url(#bg-grad)" />
+
+    <!-- Conteneur des deux points ":" -->
+    <g filter="url(#glow)">
+        <circle cx="-130" cy="-30" r="14" class="colon" />
+        <circle cx="-130" cy="30" r="14" class="colon" />
+        <circle cx="130" cy="-30" r="14" class="colon" />
+        <circle cx="130" cy="30" r="14" class="colon" />
+    </g>
+
+    <!-- Conteneurs pour chaque chiffre (HH MM SS) -->
+    <g class="digit-group" id="g0" transform="translate(-310, 0)">
+        <text class="digit-text" id="t0_a">0</text>
+        <text class="digit-text" id="t0_b" opacity="0">0</text>
+    </g>
+    <g class="digit-group" id="g1" transform="translate(-210, 0)">
+        <text class="digit-text" id="t1_a">0</text>
+        <text class="digit-text" id="t1_b" opacity="0">0</text>
+    </g>
+    <g class="digit-group" id="g2" transform="translate(-50, 0)">
+        <text class="digit-text" id="t2_a">0</text>
+        <text class="digit-text" id="t2_b" opacity="0">0</text>
+    </g>
+    <g class="digit-group" id="g3" transform="translate(50, 0)">
+        <text class="digit-text" id="t3_a">0</text>
+        <text class="digit-text" id="t3_b" opacity="0">0</text>
+    </g>
+    <g class="digit-group" id="g4" transform="translate(210, 0)">
+        <text class="digit-text" id="t4_a">0</text>
+        <text class="digit-text" id="t4_b" opacity="0">0</text>
+    </g>
+    <g class="digit-group" id="g5" transform="translate(310, 0)">
+        <text class="digit-text" id="t5_a">0</text>
+        <text class="digit-text" id="t5_b" opacity="0">0</text>
+    </g>
+
+    <script type="text/ecmascript"><![CDATA[
+        // Références aux éléments DOM
+        const dispMap = document.getElementById('morph_disp');
+        const morphBlur = document.getElementById('morph_blur');
+        
+        // Initialisation de l'état de chaque chiffre
+        let digits = [];
+        for(let i=0; i<6; i++) {
+            digits.push({
+                active: 0,
+                morphing: false,
+                t: 0,
+                a: document.getElementById(`t${i}_a`),
+                b: document.getElementById(`t${i}_b`),
+                group: document.getElementById(`g${i}`)
+            });
+        }
+
+        let animating = false;
+        let lastTime = performance.now();
+
+        // Met à jour l'heure et déclenche les morphings
+        function updateTime() {
+            let now = new Date();
+            let h = ('0' + now.getHours()).slice(-2);
+            let m = ('0' + now.getMinutes()).slice(-2);
+            let s = ('0' + now.getSeconds()).slice(-2);
+            let timeStr = h + m + s;
+
+            let needAnim = false;
+
+            for(let i=0; i<6; i++) {
+                let newChar = timeStr[i];
+                let d = digits[i];
+                let currentChar = d.active === 0 ? d.a.textContent : d.b.textContent;
+
+                // Si le chiffre change, on prépare le morphing
+                if(newChar !== currentChar) {
+                    let inactiveText = d.active === 0 ? d.b : d.a;
+                    inactiveText.textContent = newChar;
+                    
+                    d.morphing = true;
+                    d.t = 0;
+                    d.group.setAttribute('filter', 'url(#morph_glow)');
+                    needAnim = true;
+                }
+            }
+
+            // Démarre la boucle d'animation si nécessaire
+            if(needAnim && !animating) {
+                animating = true;
+                lastTime = performance.now();
+                requestAnimationFrame(tick);
+            }
+        }
+
+        // Boucle de rendu fluide
+        function tick() {
+            let now = performance.now();
+            let dt = now - lastTime;
+            lastTime = now;
+            if(dt > 100) dt = 100;
+
+            let stillMorphing = false;
+            let maxWave = 0;
+
+            for(let i=0; i<6; i++) {
+                let d = digits[i];
+                if(d.morphing) {
+                    d.t += dt / 700; // Durée du morphing : 700ms
+                    if(d.t >= 1) {
+                        // Fin du morphing
+                        d.t = 1;
+                        d.morphing = false;
+                        d.active = 1 - d.active;
+                        d.group.removeAttribute('filter');
+                        
+                        d.a.setAttribute('opacity', d.active === 0 ? 1 : 0);
+                        d.b.setAttribute('opacity', d.active === 1 ? 1 : 0);
+                        d.a.setAttribute('transform', 'translate(0 0) scale(1)');
+                        d.b.setAttribute('transform', 'translate(0 0) scale(1)');
+                    } else {
+                        // Calcul de l'interpolation
+                        stillMorphing = true;
+                        let t = d.t;
+                        
+                        // Fonction d'ease-in-out
+                        let e = t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+                        let wave = Math.sin(t * Math.PI);
+                        if(wave > maxWave) maxWave = wave;
+
+                        let oldText = d.active === 0 ? d.a : d.b;
+                        let newText = d.active === 0 ? d.b : d.a;
+
+                        // Animation des textes : l'ancien descend et rétrécit, le nouveau monte et grandit
+                        oldText.setAttribute('opacity', 1 - e);
+                        oldText.setAttribute('transform', `translate(0 ${e * 20}) scale(${1 - e * 0.2})`);
+                        
+                        newText.setAttribute('opacity', e);
+                        newText.setAttribute('transform', `translate(0 ${-20 + e * 20}) scale(${0.8 + e * 0.2})`);
+                    }
+                }
+            }
+
+            // Met à jour l'intensité du filtre de déformation en temps réel
+            if(stillMorphing) {
+                dispMap.setAttribute('scale', maxWave * 35);
+                morphBlur.setAttribute('stdDeviation', maxWave * 6);
+                requestAnimationFrame(tick);
+            } else {
+                animating = false; // Arrête la boucle pour économiser le CPU
+            }
+        }
+
+        // Initialisation
+        updateTime();
+        setInterval(updateTime, 1000);
+    ]]></script>
+</svg>
