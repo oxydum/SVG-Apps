@@ -1,0 +1,531 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 600" preserveAspectRatio="xMidYMid meet">
+  <title>Minuteur Pomodoro</title>
+  <desc>Minuteur Pomodoro animé avec paramètres avancés</desc>
+
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#161c2b"/>
+      <stop offset="100%" stop-color="#0d1117"/>
+    </radialGradient>
+    <linearGradient id="workStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0734a"/>
+      <stop offset="100%" stop-color="#e8523a"/>
+    </linearGradient>
+    <linearGradient id="breakStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3fb950"/>
+      <stop offset="100%" stop-color="#2ea043"/>
+    </linearGradient>
+    <linearGradient id="longBreakStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0c674"/>
+      <stop offset="100%" stop-color="#d4a843"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <style>
+      .ui-text { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; user-select: none; }
+      .mono { font-family: 'SF Mono', 'Cascadia Code', Consolas, monospace; }
+      .slider-track { stroke: #1e2536; stroke-width: 4; stroke-linecap: round; }
+      .slider-active { stroke: #f0734a; stroke-width: 4; stroke-linecap: round; transition: stroke 0.3s; }
+      .slider-handle { fill: #f0734a; stroke: #0d1117; stroke-width: 2; cursor: pointer; transition: fill 0.3s, r 0.2s; }
+      .slider-handle:hover { r: 9; }
+      .toggle-bg { fill: #1e2536; stroke: #30363d; stroke-width: 1; cursor: pointer; transition: fill 0.3s, stroke 0.3s; }
+      .toggle-knob { fill: #7d8590; pointer-events: none; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), fill 0.3s; }
+      .btn-bg { fill: #21262d; stroke: #30363d; stroke-width: 1; transition: fill 0.2s, stroke 0.2s; cursor: pointer; }
+      .btn-bg:hover { fill: #2a3140; stroke: #484f58; }
+      .btn-bg:active { fill: #161b22; }
+      .panel-bg { fill: rgba(22, 28, 43, 0.98); stroke: #30363d; stroke-width: 1; }
+    </style>
+  </defs>
+
+  <!-- Fond -->
+  <rect width="500" height="600" fill="url(#bgGrad)"/>
+
+  <!-- Bouton Engrenage -->
+  <g id="gearBtn" cursor="pointer" transform="translate(450, 40)">
+    <circle r="20" fill="transparent" />
+    <path d="M-6,0 a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0 M-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0 M0,-10 L0,-7 M0,7 L0,10 M-10,0 L-7,0 M7,0 L10,0 M-7,-7 L-5,-5 M5,5 L7,7 M-7,7 L-5,5 M5,-5 L7,-7" stroke="#7d8590" stroke-width="2" fill="none" stroke-linecap="round" style="transition: transform 0.4s ease, stroke 0.2s;" onmouseover="this.style.stroke='#e6edf3'" onmouseout="this.style.stroke='#7d8590'"/>
+  </g>
+
+  <!-- MINUTEUR -->
+  <g id="timerGroup">
+    <circle cx="250" cy="225" r="175" fill="none" stroke="#151b28" stroke-width="0.5" opacity="0.4"/>
+    <circle cx="250" cy="225" r="130" fill="none" stroke="#1a1f2e" stroke-width="0.5" opacity="0.3"/>
+
+    <g id="ticks"></g>
+
+    <circle cx="250" cy="225" r="150" fill="none" stroke="#1e2536" stroke-width="7"/>
+    <circle id="progress" cx="250" cy="225" r="150" fill="none"
+            stroke="url(#workStroke)" stroke-width="7" stroke-linecap="round"
+            transform="rotate(-90, 250, 225)" filter="url(#glow)"/>
+
+    <circle id="headGlow" cx="250" cy="75" r="6" fill="#f0734a" filter="url(#softGlow)" opacity="0"/>
+
+    <text id="status" class="ui-text" x="250" y="188" text-anchor="middle"
+          font-size="12" fill="#7d8590" letter-spacing="4" font-weight="600">TRAVAIL</text>
+
+    <text id="timer" class="mono" x="250" y="240" text-anchor="middle"
+          font-size="54" font-weight="300" fill="#e6edf3">25:00</text>
+
+    <g id="sessionDots"></g>
+
+    <g id="startBtn" role="button" tabindex="0">
+      <rect id="startBtnBg" class="btn-bg" x="185" y="294" width="130" height="38" rx="19"/>
+      <text id="startBtnText" class="ui-text" x="250" y="318" text-anchor="middle"
+            font-size="13" fill="#e6edf3" letter-spacing="2" font-weight="500" pointer-events="none">DÉMARRER</text>
+    </g>
+
+    <g id="resetBtn" role="button" tabindex="0" opacity="0.35">
+      <rect id="resetBtnBg" class="btn-bg" x="222" y="342" width="56" height="28" rx="14"/>
+      <text class="ui-text" x="250" y="360" text-anchor="middle"
+            font-size="10" fill="#7d8590" letter-spacing="1.5" font-weight="500" pointer-events="none">RESET</text>
+    </g>
+  </g>
+
+  <!-- PANNEAU PARAMÈTRES -->
+  <g id="settingsPanel" opacity="0" pointer-events="none" style="transition: opacity 0.3s ease;">
+    <rect width="500" height="600" fill="#0d1117" opacity="0.85" />
+    <rect class="panel-bg" x="50" y="80" width="400" height="440" rx="16" />
+    <text class="ui-text" x="80" y="125" font-size="16" font-weight="600" fill="#e6edf3">Paramètres</text>
+    
+    <line x1="80" y1="140" x2="420" y2="140" stroke="#30363d" stroke-width="1"/>
+
+    <!-- Conteneur dynamique pour les contrôles -->
+    <g id="settingsUI"></g>
+
+    <!-- Bouton Fermer -->
+    <g id="closeBtn" cursor="pointer" transform="translate(400, 115)">
+      <circle r="16" fill="transparent" />
+      <line x1="-5" y1="-5" x2="5" y2="5" stroke="#7d8590" stroke-width="2" stroke-linecap="round" onmouseover="this.parentElement.style.stroke='#e6edf3'" onmouseout="this.parentElement.style.stroke='#7d8590'"/>
+      <line x1="5" y1="-5" x2="-5" y2="5" stroke="#7d8590" stroke-width="2" stroke-linecap="round" />
+    </g>
+  </g>
+
+  <!-- Conteneur Particules -->
+  <g id="particles"></g>
+  <circle id="flash" cx="250" cy="225" r="150" fill="white" opacity="0" pointer-events="none"/>
+
+  <script type="text/ecmascript"><![CDATA[
+    // === CONFIG INITIALE & SAUVEGARDE ===
+    var DEFAULTS = { work: 25, shortBreak: 5, longBreak: 15, cycles: 4, autoStart: false, sound: true, particles: true };
+    var settings = {};
+    try {
+      var saved = localStorage.getItem('pomodoroSettings');
+      settings = saved ? JSON.parse(saved) : DEFAULTS;
+    } catch(e) { settings = DEFAULTS; }
+
+    // === ÉTAT ===
+    var CX = 250, CY = 225, R = 150;
+    var CIRC = 2 * Math.PI * R;
+    var state = 'idle';
+    var mode = 'work';
+    var totalDur = settings.work * 60;
+    var remaining = totalDur;
+    var lastTs = null;
+    var rafId = null;
+    var pomodorosDone = 0;
+    var isPanelOpen = false;
+    var activeDrag = null;
+
+    // === DOM ===
+    var svgRoot = document.documentElement;
+    var progressEl = document.getElementById('progress');
+    var headGlowEl = document.getElementById('headGlow');
+    var timerEl = document.getElementById('timer');
+    var statusEl = document.getElementById('status');
+    var startBtn = document.getElementById('startBtn');
+    var startBtnBg = document.getElementById('startBtnBg');
+    var startBtnText = document.getElementById('startBtnText');
+    var resetBtn = document.getElementById('resetBtn');
+    var ticksEl = document.getElementById('ticks');
+    var dotsEl = document.getElementById('sessionDots');
+    var particlesEl = document.getElementById('particles');
+    var flashEl = document.getElementById('flash');
+    var gearBtn = document.getElementById('gearBtn');
+    var settingsPanel = document.getElementById('settingsPanel');
+    var settingsUI = document.getElementById('settingsUI');
+    var closeBtn = document.getElementById('closeBtn');
+
+    progressEl.setAttribute('stroke-dasharray', CIRC);
+    progressEl.setAttribute('stroke-dashoffset', '0');
+
+    // === CRÉATION DYNAMIQUE DE L'UI PARAMÈTRES ===
+    function createSlider(id, label, min, max, step, val, y, callback) {
+      var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      g.setAttribute('transform', 'translate(0, ' + y + ')');
+      
+      var lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      lbl.setAttribute('class', 'ui-text');
+      lbl.setAttribute('x', 80); lbl.setAttribute('y', 0);
+      lbl.setAttribute('font-size', '13'); lbl.setAttribute('fill', '#7d8590');
+      lbl.textContent = label;
+      g.appendChild(lbl);
+      
+      var valLbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      valLbl.setAttribute('class', 'ui-text mono');
+      valLbl.setAttribute('x', 420); valLbl.setAttribute('y', 0);
+      valLbl.setAttribute('text-anchor', 'end'); valLbl.setAttribute('font-size', '13');
+      valLbl.setAttribute('fill', '#e6edf3'); valLbl.setAttribute('font-weight', '600');
+      valLbl.textContent = val;
+      g.appendChild(valLbl);
+      
+      var track = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      track.setAttribute('class', 'slider-track');
+      track.setAttribute('x1', 80); track.setAttribute('y1', 20);
+      track.setAttribute('x2', 420); track.setAttribute('y2', 20);
+      g.appendChild(track);
+      
+      var active = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      active.setAttribute('class', 'slider-active');
+      active.setAttribute('x1', 80); active.setAttribute('y1', 20);
+      active.setAttribute('x2', 80); active.setAttribute('y2', 20);
+      g.appendChild(active);
+      
+      var handle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      handle.setAttribute('class', 'slider-handle');
+      handle.setAttribute('cx', 80); handle.setAttribute('cy', 20); handle.setAttribute('r', 8);
+      handle.setAttribute('cursor', 'pointer');
+      g.appendChild(handle);
+      
+      function updateUI(newVal) {
+        valLbl.textContent = newVal;
+        var pct = (newVal - min) / (max - min);
+        var cx = 80 + pct * (420 - 80);
+        handle.setAttribute('cx', cx);
+        active.setAttribute('x2', cx);
+      }
+      
+      updateUI(val);
+
+      handle.addEventListener('mousedown', function(e) {
+        e.preventDefault();
+        activeDrag = { 
+          update: function(x) {
+            var pct = Math.max(0, Math.min(1, (x - 80) / (420 - 80)));
+            var raw = min + pct * (max - min);
+            var stepped = Math.round(raw / step) * step;
+            if (stepped !== parseInt(valLbl.textContent)) {
+              updateUI(stepped);
+              callback(stepped);
+            }
+          }
+        };
+      });
+      
+      return g;
+    }
+
+    function createToggle(id, label, val, y, callback) {
+      var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      g.setAttribute('transform', 'translate(0, ' + y + ')');
+      
+      var lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      lbl.setAttribute('class', 'ui-text');
+      lbl.setAttribute('x', 80); lbl.setAttribute('y', 20);
+      lbl.setAttribute('font-size', '13'); lbl.setAttribute('fill', '#e6edf3');
+      lbl.textContent = label;
+      g.appendChild(lbl);
+      
+      var bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      bg.setAttribute('class', 'toggle-bg');
+      bg.setAttribute('x', 380); bg.setAttribute('y', 8);
+      bg.setAttribute('width', 40); bg.setAttribute('height', 22); bg.setAttribute('rx', 11);
+      g.appendChild(bg);
+      
+      var knob = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      knob.setAttribute('class', 'toggle-knob');
+      knob.setAttribute('cx', 391); knob.setAttribute('cy', 19); knob.setAttribute('r', 8);
+      g.appendChild(knob);
+      
+      function updateUI(isOn) {
+        bg.setAttribute('fill', isOn ? 'rgba(240, 115, 74, 0.2)' : '#1e2536');
+        bg.setAttribute('stroke', isOn ? '#f0734a' : '#30363d');
+        knob.setAttribute('fill', isOn ? '#f0734a' : '#7d8590');
+        knob.setAttribute('transform', isOn ? 'translate(18, 0)' : 'translate(0, 0)');
+      }
+      updateUI(val);
+
+      bg.addEventListener('click', function() {
+        val = !val;
+        updateUI(val);
+        callback(val);
+      });
+      
+      return g;
+    }
+
+    // Construire l'UI des paramètres
+    settingsUI.appendChild(createSlider('work', 'Travail (min)', 5, 60, 5, settings.work, 170, function(v) {
+      settings.work = v; saveSettings(); if (mode === 'work' && state === 'idle') { totalDur = v*60; remaining = totalDur; updateDisplay(); buildTicks(); }
+    }));
+    settingsUI.appendChild(createSlider('shortBreak', 'Pause courte (min)', 1, 15, 1, settings.shortBreak, 210, function(v) {
+      settings.shortBreak = v; saveSettings(); if (mode === 'break' && state === 'idle') { totalDur = v*60; remaining = totalDur; updateDisplay(); buildTicks(); }
+    }));
+    settingsUI.appendChild(createSlider('longBreak', 'Pause longue (min)', 5, 30, 5, settings.longBreak, 250, function(v) {
+      settings.longBreak = v; saveSettings(); if (mode === 'longbreak' && state === 'idle') { totalDur = v*60; remaining = totalDur; updateDisplay(); buildTicks(); }
+    }));
+    settingsUI.appendChild(createSlider('cycles', 'Cycles', 2, 6, 1, settings.cycles, 290, function(v) {
+      settings.cycles = v; saveSettings(); buildDots();
+    }));
+    settingsUI.appendChild(createToggle('autoStart', 'Démarrage automatique', settings.autoStart, 340, function(v) {
+      settings.autoStart = v; saveSettings();
+    }));
+    settingsUI.appendChild(createToggle('sound', 'Sons activés', settings.sound, 380, function(v) {
+      settings.sound = v; saveSettings();
+    }));
+    settingsUI.appendChild(createToggle('particles', 'Particules animées', settings.particles, 420, function(v) {
+      settings.particles = v; saveSettings();
+    }));
+
+    // === MOUSE MOVE GLOBAL POUR SLIDERS ===
+    svgRoot.addEventListener('mousemove', function(e) {
+      if (!activeDrag) return;
+      var pt = svgRoot.createSVGPoint();
+      pt.x = e.clientX; pt.y = e.clientY;
+      var cursorpt = pt.matrixTransform(svgRoot.getScreenCTM().inverse());
+      activeDrag.update(cursorpt.x);
+    });
+    svgRoot.addEventListener('mouseup', function() { activeDrag = null; });
+
+    // === SAUVEGARDE ===
+    function saveSettings() {
+      try { localStorage.setItem('pomodoroSettings', JSON.stringify(settings)); } catch(e) {}
+    }
+
+    // === OUVERTURE/FERMETURE PANNEAU ===
+    function togglePanel(open) {
+      isPanelOpen = open !== undefined ? open : !isPanelOpen;
+      settingsPanel.setAttribute('opacity', isPanelOpen ? '1' : '0');
+      settingsPanel.style.pointerEvents = isPanelOpen ? 'auto' : 'none';
+      gearBtn.style.transform = isPanelOpen ? 'rotate(90deg)' : 'rotate(0deg)';
+      gearBtn.style.transformOrigin = 'center';
+    }
+
+    gearBtn.addEventListener('click', function() { togglePanel(); });
+    closeBtn.addEventListener('click', function() { togglePanel(false); });
+
+    // === LOGIQUE UTILITAIRE ===
+    function fmt(s) {
+      var m = Math.floor(s / 60); var sec = Math.floor(s % 60);
+      return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+    }
+    function strokeForMode() {
+      if (mode === 'work') return 'url(#workStroke)';
+      if (mode === 'longbreak') return 'url(#longBreakStroke)';
+      return 'url(#breakStroke)';
+    }
+    function colorForMode() {
+      if (mode === 'work') return '#f0734a';
+      if (mode === 'longbreak') return '#f0c674';
+      return '#3fb950';
+    }
+    function colorsForMode() {
+      if (mode === 'work') return ['#f0734a','#e8523a','#ff9f43','#feca57','#f8b739'];
+      if (mode === 'longbreak') return ['#f0c674','#d4a843','#ffeaa7','#fdcb6e','#f5c542'];
+      return ['#3fb950','#2ea043','#55efc4','#00b894','#6ef590'];
+    }
+
+    // === MARQUES & POINTS ===
+    function buildTicks() {
+      while (ticksEl.firstChild) ticksEl.removeChild(ticksEl.firstChild);
+      var n = (mode === 'work') ? settings.work : (mode === 'longbreak' ? settings.longBreak : settings.shortBreak);
+      for (var i = 0; i < n; i++) {
+        var angle = (-90 + (i / n) * 360) * Math.PI / 180;
+        var isMajor = (n <= 15) ? true : (i % 5 === 0);
+        var r1 = isMajor ? 160 : 163, r2 = isMajor ? 173 : 170;
+        var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', CX + r1 * Math.cos(angle));
+        line.setAttribute('y1', CY + r1 * Math.sin(angle));
+        line.setAttribute('x2', CX + r2 * Math.cos(angle));
+        line.setAttribute('y2', CY + r2 * Math.sin(angle));
+        line.setAttribute('stroke', isMajor ? '#2a3245' : '#1e2536');
+        line.setAttribute('stroke-width', isMajor ? 1.5 : 0.8);
+        line.setAttribute('stroke-linecap', 'round');
+        line.setAttribute('data-idx', i);
+        ticksEl.appendChild(line);
+      }
+    }
+    function updateTicks() {
+      var n = (mode === 'work') ? settings.work : (mode === 'longbreak' ? settings.longBreak : settings.shortBreak);
+      var elapsed = totalDur - remaining;
+      var minutesElapsed = elapsed / 60;
+      var ticks = ticksEl.childNodes;
+      for (var j = 0; j < ticks.length; j++) {
+        var idx = parseInt(ticks[j].getAttribute('data-idx'));
+        if (idx < Math.floor(minutesElapsed)) ticks[j].setAttribute('stroke', '#12161f');
+        else if (idx < Math.ceil(minutesElapsed)) {
+          ticks[j].setAttribute('stroke', colorForMode()); ticks[j].setAttribute('opacity', '0.5');
+        } else { ticks[j].setAttribute('stroke', '#2a3245'); ticks[j].setAttribute('opacity', '1'); }
+      }
+    }
+    function buildDots() {
+      while (dotsEl.firstChild) dotsEl.removeChild(dotsEl.firstChild);
+      var spacing = 22, startX = CX - (settings.cycles - 1) * spacing / 2;
+      for (var i = 0; i < settings.cycles; i++) {
+        var c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        c.setAttribute('cx', startX + i * spacing); c.setAttribute('cy', 268); c.setAttribute('r', 3.5);
+        c.setAttribute('fill', i < pomodorosDone ? '#f0734a' : 'none');
+        c.setAttribute('stroke', i < pomodorosDone ? '#f0734a' : '#2a3245');
+        c.setAttribute('stroke-width', '1.5');
+        dotsEl.appendChild(c);
+      }
+    }
+
+    // === AFFICHAGE ===
+    function updateDisplay() {
+      timerEl.textContent = fmt(remaining);
+      var progress = remaining / totalDur;
+      progressEl.setAttribute('stroke-dashoffset', CIRC * (1 - progress));
+      updateHeadGlow(progress);
+      updateTicks();
+    }
+    function updateHeadGlow(progress) {
+      if (state !== 'running' || progress <= 0.001) { headGlowEl.setAttribute('opacity', '0'); return; }
+      var angle = (-90 + (1 - progress) * 360) * Math.PI / 180;
+      headGlowEl.setAttribute('cx', CX + R * Math.cos(angle));
+      headGlowEl.setAttribute('cy', CY + R * Math.sin(angle));
+      headGlowEl.setAttribute('fill', colorForMode());
+      var pulse = 0.7 + 0.3 * Math.sin(Date.now() / 250);
+      headGlowEl.setAttribute('opacity', pulse);
+      headGlowEl.setAttribute('r', 4 + 2 * Math.sin(Date.now() / 300));
+    }
+    function updateModeUI() {
+      progressEl.setAttribute('stroke', strokeForMode());
+      if (mode === 'work') statusEl.textContent = 'TRAVAIL';
+      else if (mode === 'longbreak') statusEl.textContent = 'LONGUE PAUSE';
+      else statusEl.textContent = 'PAUSE';
+      buildTicks();
+    }
+    function updateButtons() {
+      startBtnText.textContent = state === 'idle' ? 'DÉMARRER' : (state === 'running' ? 'PAUSE' : 'REPRENDRE');
+      resetBtn.setAttribute('opacity', state === 'idle' ? '0.35' : '0.7');
+    }
+
+    // === MOTEUR DU MINUTEUR ===
+    function tick(ts) {
+      if (!lastTs) lastTs = ts;
+      var delta = (ts - lastTs) / 1000; lastTs = ts;
+      remaining = Math.max(0, remaining - delta);
+      updateDisplay();
+      if (remaining <= 0) { onComplete(); return; }
+      rafId = requestAnimationFrame(tick);
+    }
+    function startTimer() { state = 'running'; lastTs = null; updateButtons(); rafId = requestAnimationFrame(tick); }
+    function pauseTimer() { state = 'paused'; if (rafId) cancelAnimationFrame(rafId); rafId = null; headGlowEl.setAttribute('opacity', '0'); updateButtons(); }
+    function resetTimer() { state = 'idle'; if (rafId) cancelAnimationFrame(rafId); rafId = null; remaining = totalDur; lastTs = null; headGlowEl.setAttribute('opacity', '0'); updateDisplay(); updateButtons(); }
+    
+    function onComplete() {
+      if (rafId) cancelAnimationFrame(rafId); rafId = null; state = 'idle'; headGlowEl.setAttribute('opacity', '0');
+      if (mode === 'work') { pomodorosDone++; buildDots(); }
+      if (settings.sound) playChime();
+      if (settings.particles) { spawnParticles(); spawnShockwave(); triggerFlash(); }
+      setTimeout(function() {
+        if (mode === 'work') {
+          if (pomodorosDone >= settings.cycles) {
+            mode = 'longbreak'; totalDur = settings.longBreak * 60; pomodorosDone = 0; buildDots();
+          } else { mode = 'break'; totalDur = settings.shortBreak * 60; }
+        } else { mode = 'work'; totalDur = settings.work * 60; }
+        remaining = totalDur; updateModeUI(); updateDisplay(); updateButtons();
+        if (settings.autoStart) setTimeout(startTimer, 500);
+      }, 1500);
+    }
+
+    // === ANIMATIONS ===
+    function triggerFlash() {
+      flashEl.setAttribute('opacity', '0.25');
+      var start = Date.now();
+      function step() {
+        var t = (Date.now() - start) / 500;
+        if (t >= 1) { flashEl.setAttribute('opacity', '0'); return; }
+        flashEl.setAttribute('opacity', 0.25 * (1 - t));
+        flashEl.setAttribute('r', 150 + 40 * t);
+        requestAnimationFrame(step);
+      } requestAnimationFrame(step);
+    }
+    function spawnShockwave() {
+      var ring = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      ring.setAttribute('cx', CX); ring.setAttribute('cy', CY); ring.setAttribute('r', R);
+      ring.setAttribute('fill', 'none'); ring.setAttribute('stroke', colorForMode());
+      ring.setAttribute('stroke-width', '3'); ring.setAttribute('opacity', '0.6');
+      particlesEl.appendChild(ring);
+      var start = Date.now();
+      function step() {
+        var t = (Date.now() - start) / 700;
+        if (t >= 1) { ring.remove(); return; }
+        ring.setAttribute('r', R + 80 * t); ring.setAttribute('opacity', 0.6 * (1 - t));
+        ring.setAttribute('stroke-width', 3 * (1 - t * 0.7));
+        requestAnimationFrame(step);
+      } requestAnimationFrame(step);
+    }
+    function spawnParticles() {
+      var cols = colorsForMode();
+      for (var i = 0; i < 50; i++) {
+        (function(idx) {
+          var p = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          var angle = (Math.PI * 2 / 50) * idx + (Math.random() - 0.5) * 0.6;
+          var speed = 1.2 + Math.random() * 3.5; var size = 1.5 + Math.random() * 4;
+          p.setAttribute('cx', CX); p.setAttribute('cy', CY); p.setAttribute('r', size);
+          p.setAttribute('fill', cols[Math.floor(Math.random() * cols.length)]); p.setAttribute('opacity', '1');
+          particlesEl.appendChild(p);
+          var x = CX, y = CY, opacity = 1, vx = Math.cos(angle) * speed, vy = Math.sin(angle) * speed;
+          var grav = 0.015 + Math.random() * 0.01;
+          function step() {
+            x += vx; y += vy; vy += grav; vx *= 0.995; opacity -= 0.012 + Math.random() * 0.004;
+            if (opacity <= 0) { p.remove(); return; }
+            p.setAttribute('cx', x); p.setAttribute('cy', y);
+            p.setAttribute('opacity', Math.max(0, opacity));
+            p.setAttribute('r', Math.max(0.5, size * opacity));
+            requestAnimationFrame(step);
+          }
+          setTimeout(function() { requestAnimationFrame(step); }, idx * 8);
+        })(i);
+      }
+    }
+    function playChime() {
+      try {
+        var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+        var ctx = new AC(); var notes = [523.25, 659.25, 783.99];
+        notes.forEach(function(freq, i) {
+          var osc = ctx.createOscillator(), gain = ctx.createGain();
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.frequency.value = freq; osc.type = 'sine'; var delay = i * 0.15;
+          gain.gain.setValueAtTime(0, ctx.currentTime + delay);
+          gain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + delay + 0.04);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.55);
+          osc.start(ctx.currentTime + delay); osc.stop(ctx.currentTime + delay + 0.6);
+        });
+      } catch(e) {}
+    }
+    function breathe() {
+      if (state === 'idle') {
+        var pulse = 0.75 + 0.25 * Math.sin(Date.now() / 1200);
+        progressEl.setAttribute('opacity', pulse);
+      } else { progressEl.setAttribute('opacity', '1'); }
+      requestAnimationFrame(breathe);
+    }
+
+    // === ÉVÉNEMENTS ===
+    function toggleStartPause() {
+      if (state === 'idle' || state === 'paused') startTimer();
+      else if (state === 'running') pauseTimer();
+    }
+    startBtn.addEventListener('click', toggleStartPause);
+    resetBtn.addEventListener('click', resetTimer);
+    document.addEventListener('keydown', function(e) {
+      if (e.target.tagName === 'INPUT') return;
+      if (e.key === ' ' || e.code === 'Space') { e.preventDefault(); toggleStartPause(); }
+      else if (e.key === 'r' || e.key === 'R') resetTimer();
+      else if (e.key === 'Escape') togglePanel(false);
+    });
+
+    // === INIT ===
+    totalDur = settings.work * 60;
+    remaining = totalDur;
+    buildTicks(); buildDots(); updateDisplay(); updateButtons(); updateModeUI(); breathe();
+  ]]></script>
+</svg>
