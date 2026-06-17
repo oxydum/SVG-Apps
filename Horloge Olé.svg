@@ -1,0 +1,266 @@
+<svg xmlns="http://www.w3.org/2000/svg" id="svg-root" viewBox="-500 -150 1000 300" width="100%" height="100%">
+    <defs>
+        <!-- Dégradé d'arrière-plan style "Fiesta" -->
+        <radialGradient id="bg-grad" cx="50%" cy="50%" r="75%">
+            <stop offset="0%" stop-color="#1a0b2e" />
+            <stop offset="100%" stop-color="#08030f" />
+        </radialGradient>
+
+        <!-- Filtre de lueur standard -->
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="6" id="glow_blur_main" result="blur1" />
+            <feMerge>
+                <feMergeNode in="blur1" />
+                <feMergeNode in="SourceGraphic" />
+            </feMerge>
+        </filter>
+
+        <!-- Filtre de Morphing (Gooey + Turbulence) -->
+        <filter id="morph_glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="2" result="noise" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="0" id="morph_disp" result="disp" />
+            <feGaussianBlur in="disp" stdDeviation="0" id="morph_blur" result="blur" />
+            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
+            <feGaussianBlur in="goo" stdDeviation="6" id="glow_blur_morph" result="glow_blur" />
+            <feMerge>
+                <feMergeNode in="glow_blur" />
+                <feMergeNode in="goo" />
+            </feMerge>
+        </filter>
+
+        <style><![CDATA[
+            /* Chargement de la police Ole */
+            @import url('https://fonts.googleapis.com/css2?family=Ole&display=swap');
+            
+            .digit-text {
+                text-anchor: middle;
+                dominant-baseline: central;
+            }
+            .colon {
+                animation: blink 1s ease-in-out infinite;
+            }
+            @keyframes blink {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.15; }
+            }
+        ]]></style>
+    </defs>
+
+    <!-- Arrière-plan -->
+    <rect id="bg-rect" x="-500" y="-150" width="1000" height="300" fill="url(#bg-grad)" />
+
+    <!-- Conteneurs pour les ":" -->
+    <g class="colon-group" id="c1" filter="url(#glow)">
+        <circle cx="0" class="colon colon-top" />
+        <circle cx="0" class="colon colon-bot" />
+    </g>
+    <g class="colon-group" id="c2" filter="url(#glow)">
+        <circle cx="0" class="colon colon-top" />
+        <circle cx="0" class="colon colon-bot" />
+    </g>
+
+    <!-- Conteneurs pour chaque chiffre (HH MM SS) -->
+    <g class="digit-group" id="g0"><text class="digit-text" id="t0_a">0</text><text class="digit-text" id="t0_b" opacity="0">0</text></g>
+    <g class="digit-group" id="g1"><text class="digit-text" id="t1_a">0</text><text class="digit-text" id="t1_b" opacity="0">0</text></g>
+    <g class="digit-group" id="g2"><text class="digit-text" id="t2_a">0</text><text class="digit-text" id="t2_b" opacity="0">0</text></g>
+    <g class="digit-group" id="g3"><text class="digit-text" id="t3_a">0</text><text class="digit-text" id="t3_b" opacity="0">0</text></g>
+    <g class="digit-group" id="g4"><text class="digit-text" id="t4_a">0</text><text class="digit-text" id="t4_b" opacity="0">0</text></g>
+    <g class="digit-group" id="g5"><text class="digit-text" id="t5_a">0</text><text class="digit-text" id="t5_b" opacity="0">0</text></g>
+
+    <script type="text/ecmascript"><![CDATA[
+        // ==========================================
+        // CONFIGURATION
+        // ==========================================
+        const config = {
+            font: 'Ole',               // Nom de la police
+            fontWeight: 900,           // Épaisseur (Ole n'existe qu'en 400)
+            fontSize: 120,             // Taille de la police
+            color: '#ffcc00',          // Couleur jaune/or néon
+            morphDuration: 900,        // Durée de la transition en ms
+            morphIntensity: 30,        // Intensité de la déformation liquide
+            gooeyBlur: 3,              // Intensité de la fusion ("Gooey")
+            letterSpacing: 10          // Espacement positif pour aérer cette police très penchée
+        };
+        // ==========================================
+
+        const dispMap = document.getElementById('morph_disp');
+        const morphBlur = document.getElementById('morph_blur');
+        
+        let digits = [];
+        for(let i=0; i<6; i++) {
+            digits.push({
+                active: 0,
+                morphing: false,
+                t: 0,
+                a: document.getElementById(`t${i}_a`),
+                b: document.getElementById(`t${i}_b`),
+                group: document.getElementById(`g${i}`)
+            });
+        }
+
+        let animating = false;
+        let lastTime = performance.now();
+
+        function applyConfig() {
+            const fs = config.fontSize;
+            const fontStr = `${config.fontWeight} ${fs}px '${config.font}', cursive`;
+            
+            for(let i=0; i<6; i++) {
+                digits[i].a.style.font = fontStr;
+                digits[i].a.style.fill = config.color;
+                digits[i].a.style.letterSpacing = config.letterSpacing + 'px';
+                
+                digits[i].b.style.font = fontStr;
+                digits[i].b.style.fill = config.color;
+                digits[i].b.style.letterSpacing = config.letterSpacing + 'px';
+            }
+            
+            const r = fs * 0.08;
+            const cyOffset = fs * 0.18;
+            document.querySelectorAll('.colon').forEach(c => {
+                c.setAttribute('r', r);
+                c.style.fill = config.color;
+            });
+            document.querySelectorAll('.colon-top').forEach(c => c.setAttribute('cy', -cyOffset));
+            document.querySelectorAll('.colon-bot').forEach(c => c.setAttribute('cy', cyOffset));
+            
+            const glowSize = fs * 0.04;
+            document.getElementById('glow_blur_main').setAttribute('stdDeviation', glowSize);
+            document.getElementById('glow_blur_morph').setAttribute('stdDeviation', glowSize);
+
+            // La police Ole est étroite mais très inclinée, on ajuste la largeur et les espaces
+            const charW = fs * 0.75; 
+            const space = fs * 0.05; 
+            const colonW = fs * 0.5; 
+            
+            const totalW = 6 * charW + 4 * space + 2 * colonW;
+            let startX = -totalW / 2 + charW / 2;
+            
+            let posX = [];
+            let currentX = startX;
+            
+            posX.push(currentX); currentX += charW + space;
+            posX.push(currentX); currentX += charW + colonW/2 + space;
+            posX.push(currentX + space + colonW/2); currentX += charW + colonW/2 + space;
+            posX.push(currentX); currentX += charW + colonW/2 + space;
+            posX.push(currentX + space + colonW/2); currentX += charW + space;
+            posX.push(currentX);
+            
+            for(let i=0; i<6; i++) {
+                digits[i].group.setAttribute('transform', `translate(${posX[i]}, 0)`);
+            }
+            
+            let colon1X = (posX[1] + posX[2]) / 2;
+            let colon2X = (posX[3] + posX[4]) / 2;
+            document.getElementById('c1').setAttribute('transform', `translate(${colon1X}, 0)`);
+            document.getElementById('c2').setAttribute('transform', `translate(${colon2X}, 0)`);
+            
+            const pad = fs * 0.8; 
+            const vbW = totalW + pad * 2;
+            const vbH = fs * 1.8 + pad * 2;
+            const vbX = -vbW / 2;
+            const vbY = -vbH / 2;
+            document.getElementById('svg-root').setAttribute('viewBox', `${vbX} ${vbY} ${vbW} ${vbH}`);
+            
+            const bgRect = document.getElementById('bg-rect');
+            bgRect.setAttribute('x', vbX);
+            bgRect.setAttribute('y', vbY);
+            bgRect.setAttribute('width', vbW);
+            bgRect.setAttribute('height', vbH);
+            
+            const bgGrad = document.getElementById('bg-grad');
+            bgGrad.setAttribute('r', Math.max(vbW, vbH) * 0.75);
+        }
+
+        function updateTime() {
+            let now = new Date();
+            let h = ('0' + now.getHours()).slice(-2);
+            let m = ('0' + now.getMinutes()).slice(-2);
+            let s = ('0' + now.getSeconds()).slice(-2);
+            let timeStr = h + m + s;
+
+            let needAnim = false;
+
+            for(let i=0; i<6; i++) {
+                let newChar = timeStr[i];
+                let d = digits[i];
+                let currentChar = d.active === 0 ? d.a.textContent : d.b.textContent;
+
+                if(newChar !== currentChar) {
+                    let inactiveText = d.active === 0 ? d.b : d.a;
+                    inactiveText.textContent = newChar;
+                    
+                    d.morphing = true;
+                    d.t = 0;
+                    d.group.setAttribute('filter', 'url(#morph_glow)');
+                    needAnim = true;
+                }
+            }
+
+            if(needAnim && !animating) {
+                animating = true;
+                lastTime = performance.now();
+                requestAnimationFrame(tick);
+            }
+        }
+
+        function tick() {
+            let now = performance.now();
+            let dt = now - lastTime;
+            lastTime = now;
+            if(dt > 100) dt = 100;
+
+            let stillMorphing = false;
+            let maxWave = 0;
+
+            for(let i=0; i<6; i++) {
+                let d = digits[i];
+                if(d.morphing) {
+                    d.t += dt / config.morphDuration;
+                    if(d.t >= 1) {
+                        d.t = 1;
+                        d.morphing = false;
+                        d.active = 1 - d.active;
+                        d.group.removeAttribute('filter');
+                        
+                        d.a.setAttribute('opacity', d.active === 0 ? 1 : 0);
+                        d.b.setAttribute('opacity', d.active === 1 ? 1 : 0);
+                        d.a.setAttribute('transform', 'translate(0 0) scale(1)');
+                        d.b.setAttribute('transform', 'translate(0 0) scale(1)');
+                    } else {
+                        stillMorphing = true;
+                        let t = d.t;
+                        
+                        let e = t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+                        let wave = Math.sin(t * Math.PI);
+                        if(wave > maxWave) maxWave = wave;
+
+                        let oldText = d.active === 0 ? d.a : d.b;
+                        let newText = d.active === 0 ? d.b : d.a;
+
+                        let moveOffset = config.fontSize * 0.1;
+                        
+                        oldText.setAttribute('opacity', 1 - e);
+                        oldText.setAttribute('transform', `translate(0 ${e * moveOffset}) scale(${1 - e * 0.2})`);
+                        
+                        newText.setAttribute('opacity', e);
+                        newText.setAttribute('transform', `translate(0 ${-moveOffset + e * moveOffset}) scale(${0.8 + e * 0.2})`);
+                    }
+                }
+            }
+
+            if(stillMorphing) {
+                dispMap.setAttribute('scale', maxWave * config.morphIntensity);
+                morphBlur.setAttribute('stdDeviation', maxWave * config.gooeyBlur);
+                requestAnimationFrame(tick);
+            } else {
+                animating = false;
+            }
+        }
+
+        // Initialisation
+        applyConfig();
+        updateTime();
+        setInterval(updateTime, 1000);
+    ]]></script>
+</svg>
